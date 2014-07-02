@@ -17,10 +17,47 @@
 
 \section{Introduction}
 
+- [ ] There is a lot of research in SAT solvers
+- [ ] Interest in solving other problems (combinatorial, constraints)
+      using SAT
+- [ ] Disadvantages of transforming non-SAT problems into SAT problems
+    - [ ] Results in huge SAT problems with possibly millions of clauses
+    - [ ] Removes structure of original problem
+    - [ ] Nature of problem can influence best encoding for the problem
+        - [ ] Automatic encoding can result in bad performance during
+              solving
+
 \section{Encoding of the social golfer problem}
+
+- [ ] Description
+    - [ ] Specific
+    - [ ] Generalized
+- [ ] Encoding
+    - [ ] Defining the variables
+    - [ ] Building constraints
+        - [ ] "External constraints"
+        - [ ] "Internal constraints"
+            - [ ] Ladder Matrix
 
 \section{Symmetry breaking}
 
+- [ ] What are (the) symmetries
+- [ ] How to break symmetries (different methods and their trade-offs)
+    - [ ] Remodeling
+    - [ ] Adding constraints to the model (statically)
+    - [ ] Adding constraints during search (dynamically)
+- [ ] Breaking symmetries for the social golfer
+
 \section{Conclusion}
+
+- [ ] Removing symmetries can speed up the SAT solving by reducing the
+      solution space
+- [ ] Removing symmetries adds extra costs to the modelling process
+    - [ ] Trade-off: costs for eliminating symmetries vs. cost for
+          longer run of solver
+    - [ ] Does not always pay off (as results in the paper show)
+- [ ] Social golfer encoding made a trade-off between intuitive model
+      and a model suited to avoid symmetries
+
 
 \end{document}
