@@ -4,6 +4,7 @@
 \usepackage{graphics} % for EPS, load graphicx instead
 \usepackage{url}      % llt: nicely formatted URLs
 \usepackage{amsmath}
+\usepackage{mdframed}
 
 \title{Symmetry breaking in an encoding for the social golfer problem}
 \author{Dennis Lewandowski}
@@ -17,11 +18,88 @@
 
 \section{Introduction}
 
-- [ ] There is a lot of research in SAT solvers
-
 A lot of effort is put into developing faster and better SAT solvers every year. With the solvers becoming more efficient, it becomes more attractive to use SAT solving even for problems that do not occur naturally encoded in SAT, such as combinatorial problems or constraint problems. Transferring non-SAT problems into SAT-problems can yield several inefficiences. A constraint problem that, stated in its original form, consists of only few constraints can grow into millions of clauses when converted into SAT. Also, converting a problem into SAT , depending on the encoding that was chosen, might result in formulas that are not as intuitively and easy to understand as the original problem and therefore it might be hard to extend the problem to include further constraints and maintain it on the long run.
 
-While a lot of research is done on optimising SAT solvers, 
+While a lot of research is done on optimising SAT solvers, a great deal of optimization can be achieved using an optimal encoding of the problem. When chosing an encoding for a problem, one has to make a trade-off between different aspects of the encoding. An encoding could aim be intuitive and understandable. It could be desired to have a minimum set of variables, minimizing the space of possible variable assignments and therefore speeding up computation. It could take into account specific aspects of the very nature of the problem itself, such as symmetries in combinatorial problems.
+
+\subsection{The Social Golfer Problem}
+
+This paper will take a look into an encoding of the social golfer problem. The social golfer problem presents a class of highly symmetrical combinatorial problems. The original social golfer problem is stated as follows:
+
+\begin{mdframed}[skipabove=\baselineskip, skipbelow=\baselineskip, leftmargin=20, rightmargin=20]
+
+Given the following constraints, find a schedule of play for these golfers for as many weeks as possible:
+
+\begin{enumerate}
+    \item A golf club has 32 members.
+    \item Each member plays golf once in a week.
+    \item Golfers always play in groups of 4
+    \item No golfer plays in the same group as any other golfer twice
+\end{enumerate}
+
+\end{mdframed}
+
+% Mehr sinnvolle w-p-g Tupel finden...
+As the number of weeks, the number of players and the size of the groups in the original problem is generalisable into a triple w-p-g, with w being the number of weeks to play, p being the number of players per group and g being the number of groups. By entering distinct values into the triple, one can construct other well known combinatorial problems. A tuple of 1-2-(n/2) represents the problem of constructing a round-robin tournament schedule, where n is the number of overall players. Another tuple for a well known problem is 7-3-5, which resembles Kirkman's Schoolgirl Problem: ``Fifteen young ladies in a school walk out three abreast for seven days in succession: it is required to arrange them daily so that no two shall walk twice abreast.''. The Social Golfer Problem itself is described by the tuple w-4-8. The overall goal is to find a maximal value for w. With 32 players and each player facing 3 new other players each week, w can not be greater than 10.
+
+
+\subsection{Symmetries in Combinatorial Problems}
+
+When given a combinatorial problem, in which instances are grouped together following a set of constraints, often times the order of instances within a group is considered irrelevant. Often times, as in the Social Golfer Problem, the order of groups itself is also considered irrelevant. Take for example the following excerpt of a possible assignment for Kirkman's Schoolgirl Problem:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{| l | l | l | l| l | l |}
+\hline
+Sunday & ABC & DEF & GHI & JKL & MNO \\
+\hline
+Monday & ADH  & BEK & CIO & FLN & GJM \\
+\hline
+\end{tabular}
+\end{table}
+
+The solution obviously stays valid if the days or the groups are changed within:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{| l | l | l | l| l | l |}
+\hline
+\emph{Sunday} & ADH  & BEK & CIO & FLN & GJM \\
+\hline
+\emph{Monday} & ABC & DEF & GHI & JKL & MNO \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{| l | l | l | l| l | l |}
+\hline
+Sunday & \emph{DEF} & \emph{ABC} & GHI & JKL & MNO \\
+\hline
+Monday & ADH  & BEK & CIO & \emph{GJM} & \emph{FLN}\\
+\hline
+\end{tabular}
+\end{table}
+
+One can even change the order of entities within each group without making the solution invalid.
+
+% 'non-solutions' ist crap. Ausserdem genauere Verwendung von 'solutions' und 'assignments'
+The presented assignments are called \emph{symmatrical}. Symmetrical assignments form equivalence classes that will either contain only solutions or no solutions [Smith 2001]. When a partial assignment is proven to lead to no solution, all symmetrical assignments will also lead to no solution. Symmetries within a solution space therefore produce redundant search pathes, which slow down backtracking search. When a problem has no solution, the space of possible solutions can be reduced by removing symmetrical non-solutions.
+
+Symmetries can be removed in the following ways:
+
+\begin{enumerate}
+\item Remodel the problem
+\item Add more constraints to the model
+\item Avoid symmetrically equivalent states during search
+\end{enumerate}
+
+The goal of remodelling the problem is to achieve a model that has less inherent symmetries. For example by enumerating the instances or groups within a problem will yield a highly symmetrical solution space, since the entities and groups are modelled as to be distinguishable. Modelling the problem without any symmetries often times leads to the use of variables that are highly abstracted and takes a lot of effort. Often times, the effort of finding a model with no symmetry outnumbers the extra time the solver needs to solve the problem using a model with symmetries.
+
+By adding constraints to the model in order to reduce symmetry, search can be speed up, while the original modelling of the problem stays the same. The additional constraints may produce computation overhead, which may in turn negate the effect of a smaller solution space.
+
+In order to avoid symmetrical equivalent states during search, a specialized solver is needed. Since such a solver produces computation overhead between branching decisions, such a solver would no longer be efficient for solving problems with less to no symmetry.
 
 % SAT Competition 2014 
 %   http://satcompetition.org/2014/ 
@@ -39,14 +117,6 @@ While a lot of research is done on optimising SAT solvers,
 % http://www.satisfiability.org/
 
 
-- [ ] Interest in solving other problems (combinatorial, constraints)
-      using SAT
-- [ ] Disadvantages of transforming non-SAT problems into SAT problems
-    - [ ] Results in huge SAT problems with possibly millions of clauses
-    - [ ] Removes structure of original problem
-    - [ ] Nature of problem can influence best encoding for the problem
-        - [ ] Automatic encoding can result in bad performance during
-              solving
 
 \section{Encoding of the social golfer problem}
 
