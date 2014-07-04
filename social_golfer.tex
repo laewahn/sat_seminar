@@ -39,7 +39,7 @@ Given the following constraints, find a schedule of play for these golfers for a
 
 \end{mdframed}
 
-% Mehr sinnvolle w-p-g Tupel finden...
+% TODO: Mehr sinnvolle w-p-g Tupel finden...
 As the number of weeks, the number of players and the size of the groups in the original problem is generalisable into a triple w-p-g, with w being the number of weeks to play, p being the number of players per group and g being the number of groups. By entering distinct values into the triple, one can construct other well known combinatorial problems. A tuple of 1-2-(n/2) represents the problem of constructing a round-robin tournament schedule, where n is the number of overall players. Another tuple for a well known problem is 7-3-5, which resembles Kirkman's Schoolgirl Problem: ``Fifteen young ladies in a school walk out three abreast for seven days in succession: it is required to arrange them daily so that no two shall walk twice abreast.''. The Social Golfer Problem itself is described by the tuple w-4-8. The overall goal is to find a maximal value for w. With 32 players and each player facing 3 new other players each week, w can not be greater than 10.
 
 
@@ -84,7 +84,7 @@ Monday & ADH  & BEK & CIO & \emph{GJM} & \emph{FLN}\\
 
 One can even change the order of entities within each group without making the solution invalid.
 
-% 'non-solutions' ist crap. Ausserdem genauere Verwendung von 'solutions' und 'assignments'
+% TODO: 'non-solutions' ist crap. Ausserdem genauere Verwendung von 'solutions' und 'assignments'
 The presented assignments are called \emph{symmatrical}. Symmetrical assignments form equivalence classes that will either contain only solutions or no solutions [Smith 2001]. When a partial assignment is proven to lead to no solution, all symmetrical assignments will also lead to no solution. Symmetries within a solution space therefore produce redundant search pathes, which slow down backtracking search. When a problem has no solution, the space of possible solutions can be reduced by removing symmetrical non-solutions.
 
 Symmetries can be removed in the following ways:
