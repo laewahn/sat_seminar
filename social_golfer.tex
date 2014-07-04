@@ -18,9 +18,9 @@
 
 \section{Introduction}
 
-A lot of effort is put into developing faster and better SAT solvers every year. With the solvers becoming more efficient, it becomes more attractive to use SAT solving even for problems that do not occur naturally encoded in SAT, such as combinatorial problems or constraint problems. Transferring non-SAT problems into SAT-problems can yield several inefficiences. A constraint problem that, stated in its original form, consists of only few constraints can grow into millions of clauses when converted into SAT. Also, converting a problem into SAT , depending on the encoding that was chosen, might result in formulas that are not as intuitively and easy to understand as the original problem and therefore it might be hard to extend the problem to include further constraints and maintain it on the long run.
+A lot of effort is put into developing faster and better SAT solvers every year. With the solvers becoming more efficient, it becomes more attractive to use SAT solving even for problems that do not occur naturally encoded in SAT, such as combinatorial problems or constraint problems. Transferring non-SAT problems into SAT-problems can yield several inefficiencies. A constraint problem that, stated in its original form, consists of only few constraints can grow into millions of clauses when converted into SAT. Also, converting a problem into SAT , depending on the encoding that was chosen, might result in formulas that are not as intuitively and easy to understand as the original problem and therefore it might be hard to extend the problem to include further constraints and maintain it on the long run.
 
-While a lot of research is done on optimising SAT solvers, a great deal of optimization can be achieved using an optimal encoding of the problem. When chosing an encoding for a problem, one has to make a trade-off between different aspects of the encoding. An encoding could aim be intuitive and understandable. It could be desired to have a minimum set of variables, minimizing the space of possible variable assignments and therefore speeding up computation. It could take into account specific aspects of the very nature of the problem itself, such as symmetries in combinatorial problems.
+While a lot of research is done on optimizing SAT solvers, a great deal of optimization can be achieved using an optimal encoding of the problem. When choosing an encoding for a problem, one has to make a trade-off between different aspects of the encoding. An encoding could aim be intuitive and understandable. It could be desired to have a minimum set of variables, minimizing the space of possible variable assignments and therefore speeding up computation. It could take into account specific aspects of the very nature of the problem itself, such as symmetries in combinatorial problems.
 
 \subsection{The Social Golfer Problem}
 
@@ -40,7 +40,7 @@ Given the following constraints, find a schedule of play for these golfers for a
 \end{mdframed}
 
 % TODO: Mehr sinnvolle w-p-g Tupel finden...
-As the number of weeks, the number of players and the size of the groups in the original problem is generalisable into a triple w-p-g, with w being the number of weeks to play, p being the number of players per group and g being the number of groups. By entering distinct values into the triple, one can construct other well known combinatorial problems. A tuple of 1-2-(n/2) represents the problem of constructing a round-robin tournament schedule, where n is the number of overall players. Another tuple for a well known problem is 7-3-5, which resembles Kirkman's Schoolgirl Problem: ``Fifteen young ladies in a school walk out three abreast for seven days in succession: it is required to arrange them daily so that no two shall walk twice abreast.''. The Social Golfer Problem itself is described by the tuple w-4-8. The overall goal is to find a maximal value for w. With 32 players and each player facing 3 new other players each week, w can not be greater than 10.
+As the number of weeks, the number of players and the size of the groups in the original problem is generalizable into a triple w-p-g, with w being the number of weeks to play, p being the number of players per group and g being the number of groups. By entering distinct values into the triple, one can construct other well known combinatorial problems. A tuple of 1-2-(n/2) represents the problem of constructing a round-robin tournament schedule, where n is the number of overall players. Another tuple for a well known problem is 7-3-5, which resembles Kirkman's Schoolgirl Problem: ``Fifteen young ladies in a school walk out three abreast for seven days in succession: it is required to arrange them daily so that no two shall walk twice abreast.''. The Social Golfer Problem itself is described by the tuple w-4-8. The overall goal is to find a maximal value for w. With 32 players and each player facing 3 new other players each week, w can not be greater than 10.
 
 
 \subsection{Symmetries in Combinatorial Problems}
@@ -85,7 +85,7 @@ Monday & ADH  & BEK & CIO & \emph{GJM} & \emph{FLN}\\
 One can even change the order of entities within each group without making the solution invalid.
 
 % TODO: 'non-solutions' ist crap. Ausserdem genauere Verwendung von 'solutions' und 'assignments'
-The presented assignments are called \emph{symmatrical}. Symmetrical assignments form equivalence classes that will either contain only solutions or no solutions [Smith 2001]. When a partial assignment is proven to lead to no solution, all symmetrical assignments will also lead to no solution. Symmetries within a solution space therefore produce redundant search pathes, which slow down backtracking search. When a problem has no solution, the space of possible solutions can be reduced by removing symmetrical non-solutions.
+The presented assignments are called \emph{symmatrical}. Symmetrical assignments form equivalence classes that will either contain only solutions or no solutions [Smith 2001]. When a partial assignment is proven to lead to no solution, all symmetrical assignments will also lead to no solution. Symmetries within a solution space therefore produce redundant search paths, which slow down backtracking search. When a problem has no solution, the space of possible solutions can be reduced by removing symmetrical non-solutions.
 
 Symmetries can be removed in the following ways:
 
@@ -95,9 +95,9 @@ Symmetries can be removed in the following ways:
 \item Avoid symmetrically equivalent states during search
 \end{enumerate}
 
-The goal of remodelling the problem is to achieve a model that has less inherent symmetries. For example by enumerating the instances or groups within a problem will yield a highly symmetrical solution space, since the entities and groups are modelled as to be distinguishable. Modelling the problem without any symmetries often times leads to the use of variables that are highly abstracted and takes a lot of effort. Often times, the effort of finding a model with no symmetry outnumbers the extra time the solver needs to solve the problem using a model with symmetries.
+The goal of remodeling the problem is to achieve a model that has less inherent symmetries. For example by enumerating the instances or groups within a problem will yield a highly symmetrical solution space, since the entities and groups are modeled as to be distinguishable. Modeling the problem without any symmetries often times leads to the use of variables that are highly abstracted and takes a lot of effort. Often times, the effort of finding a model with no symmetry outnumbers the extra time the solver needs to solve the problem using a model with symmetries.
 
-By adding constraints to the model in order to reduce symmetry, search can be speed up, while the original modelling of the problem stays the same. The additional constraints may produce computation overhead, which may in turn negate the effect of a smaller solution space.
+By adding constraints to the model in order to reduce symmetry, exhaustive search can be speed up, while the original modeling of the problem stays the same. The additional constraints may produce computation overhead, which may in turn negate the effect of a smaller solution space. In turn, due to the additional constraints, first-solution-search can be slowed down significantly [Prestwich].
 
 In order to avoid symmetrical equivalent states during search, a specialized solver is needed. Since such a solver produces computation overhead between branching decisions, such a solver would no longer be efficient for solving problems with less to no symmetry.
 
@@ -143,7 +143,7 @@ In order to avoid symmetrical equivalent states during search, a specialized sol
 
 - [ ] Removing symmetries can speed up the SAT solving by reducing the
       solution space
-- [ ] Removing symmetries adds extra costs to the modelling process
+- [ ] Removing symmetries adds extra costs to the modeling process
     - [ ] Trade-off: costs for eliminating symmetries vs. cost for
           longer run of solver
     - [ ] Does not always pay off (as results in the paper show)
