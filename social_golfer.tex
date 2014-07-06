@@ -120,7 +120,14 @@ In order to avoid symmetrical equivalent states during search, a specialized sol
 
 \section{Encoding of the social golfer problem}
 
+In order to model the Social Golfer Problem, we first need to define a model that represents whether a certain golfer plays in a certain week within a certain group. In addition to this, our model will also state that a given golfer is at a certain position within a group. With respect to eliminating symmetries within the model, this is certainly counter-intuitive. By introducing any kind of order into a set of changeable entities, symmetries will be introduced. However, modelling it this way allows to state most constraints as at-most-one and at-least-one clasues, making the constraints more intuitive.
+
+Let $x = p \times g$ be the number of players. The first variable introduced to our model is $\text{GOLFER}_{ijkl}$, with $1 \leq i \leq x$, $1 \leq j \leq p$, $1 \leq k \leq g$ and $1 \leq l \leq w$.
+
+The fact that each golfer plays in at least one group every week is modeled as follows:
+
 \begin{equation}
+\label{form:everyone_plays}
 % Every golfer must play in every week in at least one group at at least one position
 \centering
     \bigwedge \limits_{i=1}^x 
@@ -129,6 +136,8 @@ In order to avoid symmetrical equivalent states during search, a specialized sol
     \bigvee \limits_{k=1}^g 
     \text{GOLFER}_{ijkl}
 \end{equation}
+
+To make sure that no golfer is assigned to more than on position inside a group, we'll add the following clauses:
 
 \begin{equation}
 % When a golfer plays at a position inside a group, he can not play on any other position in the same group
@@ -144,6 +153,8 @@ In order to avoid symmetrical equivalent states during search, a specialized sol
     % \vee 
     \neg \text{GOLFER}_{imkl}
 \end{equation}
+
+To make sure that no golfer plays in more than one group within the same week, the following clauses are added:
 
 \begin{equation}
 % When a golfer plays at a position inside a group within one week, he cannot play at any position and group in the same week
@@ -161,6 +172,8 @@ In order to avoid symmetrical equivalent states during search, a specialized sol
     \neg \text{GOLFER}_{inml}
 \end{equation}
 
+The next set of clauses ensures that every position in each group within each week is assigned to at least one golfer.
+
 \begin{equation}
 % On every day in every group at every position there is at least one golfer playing
 \centering
@@ -170,6 +183,9 @@ In order to avoid symmetrical equivalent states during search, a specialized sol
     \bigvee \limits_{i=1}^x 
     \text{GOLFER}_{ijkl}
 \end{equation}
+
+
+Finally, the following set of clauses ensure that each position within each group is at most taken by one golfer.
 
 \begin{equation}
 % If within a week within a group a position is already taken by a golfer, this position can not be taken by another golfer
