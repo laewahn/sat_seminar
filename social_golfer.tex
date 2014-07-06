@@ -207,15 +207,51 @@ Finally, the following set of clauses ensure that each position within each grou
     \text{GOLFER'}_{ikl} \iff \bigvee \limits_{j=1}^p \text{GOLFER}_{ijkl}
 \end{equation}
 
-
-- [ ] Encoding
-    - [ ] Defining the variables
-    - [ ] Building constraints
-        - [ ] "External constraints"
-        - [ ] "Internal constraints"
-            - [ ] Ladder Matrix
+- [ ] Ladder Matrix
 
 \section{Symmetry breaking}
+
+As already mentioned when defining the GOLFER variable, our model turns out to be highly symmetrical. Besides ordering weeks, groups and players, we introduced more symmetries by ordering players within a group into certain positions. A model with minimal symmetries would have to model players, weeks and groups as completely interchangeable. However, finding such an encoding might cost more effort than it could be counterbalanced with an efficient non-symmetrical encoding. 
+
+In order to break the symmetry introduced through our encoding, we will add some symmetry-breaking clauses to the encoding. The main idea here is to force entities into a lexographical order. First, we will enforce an increasing numerical order onto players within the same group, by prohibiting assignments where players with indices smaller than the player at a certain position are placed at positions with a higher index than the latter:
+
+\begin{equation}
+\centering
+    \bigwedge \limits_{i=1}^x
+    \bigwedge \limits_{j=1}^p
+    \bigwedge \limits_{k=1}^g
+    \bigwedge \limits_{l=1}^w
+    \bigwedge \limits_{m=1}^{i-1}
+    \text{GOLFER}_{ijkl}
+    \to
+    \neg \text{GOLFER}_{m(j+1)kl}
+\end{equation}
+
+More symmetries can be broken by forcing the first players of each group within one week into a lexicographical order. This is achieved by setting golfer number 1 as the first golfer in the first group within every week. Further we disallow assignments where golfers with a smaller index than the first golfer within a group are assigned the first golfer in a group with a bigger index than the latter:
+
+\begin{equation}
+\centering
+    \bigwedge \limits_{i=1}^x
+    \bigwedge \limits_{k=1}^g
+    \bigwedge \limits_{l=1}^w
+    \bigwedge \limits_{m=1}^{i-1}
+    \text{GOLFER}_{i1kl}
+    \to
+    \neg \text{GOLFER}_{m1(k+1)l}
+\end{equation}
+
+Lastly we will break symmetries between weeks. For this, we enforce a lexicographical order onto the second players within each group between weeks in a manner similar to the ones before:
+
+\begin{equation}
+\centering
+    \bigwedge \limits_{i=1}^x
+    \bigwedge \limits_{k=1}^g
+    \bigwedge \limits_{l=1}^w
+    \bigwedge \limits_{m=1}^{i-1}
+    \text{GOLFER}_{i2kl}
+    \to
+    \neg \text{GOLFER}_{m2k(l+1)}
+\end{equation}
 
 - [ ] What are (the) symmetries
 - [ ] How to break symmetries (different methods and their trade-offs)
