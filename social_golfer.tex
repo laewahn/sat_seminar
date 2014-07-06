@@ -120,9 +120,78 @@ In order to avoid symmetrical equivalent states during search, a specialized sol
 
 \section{Encoding of the social golfer problem}
 
-- [ ] Description
-    - [ ] Specific
-    - [ ] Generalized
+\begin{equation}
+% Every golfer must play in every week in at least one group at at least one position
+\centering
+    \bigwedge \limits_{i=1}^x 
+    \bigwedge \limits_{l=1}^w 
+    \bigvee \limits_{j=1}^p
+    \bigvee \limits_{k=1}^g 
+    \text{GOLFER}_{ijkl}
+\end{equation}
+
+\begin{equation}
+% When a golfer plays at a position inside a group, he can not play on any other position in the same group
+\centering
+    \bigwedge \limits_{i=1}^x 
+    \bigwedge \limits_{l=1}^w 
+    \bigwedge \limits_{j=1}^p
+    \bigwedge \limits_{k=1}^g 
+    \bigwedge \limits_{m=j+1}^p 
+    % \neg 
+    \text{GOLFER}_{ijkl} 
+    \to
+    % \vee 
+    \neg \text{GOLFER}_{imkl}
+\end{equation}
+
+\begin{equation}
+% When a golfer plays at a position inside a group within one week, he cannot play at any position and group in the same week
+\centering
+    \bigwedge \limits_{i=1}^x 
+    \bigwedge \limits_{l=1}^w 
+    \bigwedge \limits_{j=1}^p
+    \bigwedge \limits_{k=1}^g 
+    \bigwedge \limits_{m=k+1}^g 
+    \bigwedge \limits_{n=j+1}^p 
+    % \neg 
+    \text{GOLFER}_{ijkl} 
+    \to
+    % \vee 
+    \neg \text{GOLFER}_{inml}
+\end{equation}
+
+\begin{equation}
+% On every day in every group at every position there is at least one golfer playing
+\centering
+    \bigwedge \limits_{l=1}^w 
+    \bigwedge \limits_{k=1}^g 
+    \bigwedge \limits_{j=1}^p
+    \bigvee \limits_{i=1}^x 
+    \text{GOLFER}_{ijkl}
+\end{equation}
+
+\begin{equation}
+% If within a week within a group a position is already taken by a golfer, this position can not be taken by another golfer
+\centering
+    \bigwedge \limits_{l=1}^w 
+    \bigwedge \limits_{k=1}^g 
+    \bigwedge \limits_{j=1}^p
+    \bigwedge \limits_{i=1}^x 
+    \bigwedge \limits_{m=i+1}^x 
+    % \neg 
+    \text{GOLFER}_{ijkl} 
+    \to
+    % \vee 
+    \neg \text{GOLFER}_{imkl}
+\end{equation}
+
+
+\begin{equation}
+    \text{GOLFER'}_{ikl} \iff \bigvee \limits_{j=1}^p \text{GOLFER}_{ijkl}
+\end{equation}
+
+
 - [ ] Encoding
     - [ ] Defining the variables
     - [ ] Building constraints
