@@ -5,6 +5,7 @@
 \usepackage{url}      % llt: nicely formatted URLs
 \usepackage{amsmath}
 \usepackage{mdframed}
+\usepackage[table]{xcolor}
 
 \title{Symmetry breaking in an encoding for the social golfer problem}
 \author{Dennis Lewandowski}
@@ -120,9 +121,18 @@ In order to avoid symmetrical equivalent states during search, a specialized sol
 
 \section{Encoding of the social golfer problem}
 
+In this section we encode the constraints of the Social Golfer Problem. The first group of constraints deals with the number of groups a golfer can be assigned to, the number of weeks that a group can be assigned to, et cetera. We will refer to this as \emph{``external constraints''}, as they set the framework within which we can assign golfers to groups and groups to weeks.
+
+The second group of constraints deals with the rule that each golfer is only allowed to play with each other player once. We will refer to this constraint as \emph{``internal constraint''}, as it deals with conflicts occuring in an assignment which is valid within the external constraints.
+
+
+\subsection{Modeling external constraints}
+
 In order to model the Social Golfer Problem, we first need to define a model that represents whether a certain golfer plays in a certain week within a certain group. In addition to this, our model will also state that a given golfer is at a certain position within a group. With respect to eliminating symmetries within the model, this is certainly counter-intuitive. By introducing any kind of order into a set of changeable entities, symmetries will be introduced. However, modelling it this way allows to state most constraints as at-most-one and at-least-one clasues, making the constraints more intuitive.
 
 Let $x = p \times g$ be the number of players. The first variable introduced to our model is $\text{GOLFER}_{ijkl}$, with $1 \leq i \leq x$, $1 \leq j \leq p$, $1 \leq k \leq g$ and $1 \leq l \leq w$.
+
+
 
 The fact that each golfer plays in at least one group every week is modeled as follows:
 
@@ -203,17 +213,77 @@ Finally, the following set of clauses ensure that each position within each grou
 \end{equation}
 
 
+\subsection{Modeling internal constraints}
+
+The last constraint we need to add is the one that guarantees that no golfer plays in the same group as any other golfer twice. To ensure this, we will introdoce a construction that is called a ``ladder matrix''.
+
+
+\subsubsection{Constructing the ladder matrix}
+
+\begin{table}[h]
+\centering
+\label{ladder:example}
+\begin{tabular}{ l | l | l | l | l | l | l }
+
+    & 1.1 & 1.2 & 2.1 & 2.2 & 3.1 & 3.2 \\
+\hline
+3.4 & --- & --- & --- & --- & --- & --- \\
+2.3 & --- & --- & --- & --- & --- & --- \\
+2.4 & --- & --- & --- & --- & --- & --- \\
+1.2 & --- & --- & --- & --- & --- & --- \\
+1.3 & --- & --- & --- & --- & --- & --- \\
+1.4 & --- & --- & --- & --- & --- & --- \\
+
+\end{tabular}
+\caption{The ladder variables presented as a table for the Social Golfer Problem 3-2-2. Each row represents a unique combination of two players. Each column represents a group within a week.}
+\end{table}
+
+A ladder matrix is built with a set of auxilliary boolean ladder variables. The ladder variables will indicate whether two players are scheduled to play in a certain week within a certain group. We will denote the ladder variables as $\text{Ladder}_{yz}$, where $1 \leq y \leq {x \choose 2}$ and $1 \leq z \leq g \times w$. Values of $y$ indicate a match between two players, values of $z$ represent a combination of a week and a team number (see table \ref{ladder:example}). 
+
+
+
+Because we constructed variables for exactly ${x \choose 2}$, we end up with a set of all combinations of weeks and groups for each unique pair of two players. The next thing we need to do is to make sure that once a pair of players is assigned into one group within one week, this pair is not assigned any other group in any other week.
+
+Consider the ladder variables for a fixed pair of players. We define such a row to be valid if and only if it is built of a sequence of zero or more true assignments, followed only by false assignments. So once a ladder variable within a row is set to false, each subsequent variable must also be false. This is achieved by adding clause \ref{ladder:propagation}:
+
+\begin{equation}
+\label{ladder:propagation}
+\centering
+    \bigwedge \limits_{y=1}^{{x \choose 2}}
+    \bigwedge \limits_{z=1}^{(g \times w)-1}
+    \text{Ladder}_{yz+1}
+    \to
+    \text{Ladder}_{yz}
+\end{equation}
+
+Given this encoding, we define that a pair of players is assigned a group $k$ and a week $l$ when the ladder variable in their respective row is false for the first time. As an example consider the following assignment of ladder variables for the match between the players 1 and 2:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ l | l | l | l | l | l | l }
+    & 1.1 & 1.2 & 2.1 & 2.2 & 3.1 & 3.2 \\
+\hline
+1.2 & T & T & \textbf{T} & \textbf{F} & F & F \\
+\end{tabular}
+\end{table}
+
+With respect to \ref{ladder:propagation} this is a valid assignment of ladder variables. The change from true assignments to false assignments from column 2.1 to column 2.2 (emphasized in bold) schedules player 1 and 2 to play within group 1 in week 2. Because of \ref{ladder:propagation} it is no longer possible to schedule this pair of players to another group in another week. So no golfer can play with another golfer in the same group more than once.
+
+
+\subsection{Matching entries of the ladder matrix to the $\text{GOLFER}$ variable}
+
+Finally we need to link the results of the assignment of our ladder matrix to our set of external constraints. First, we introduce an auxilliary variable $\text{GOLFER'}_{ikl}$, with $1 \leq i \leq x$, $1 \leq k \leq g$ and $1 \leq l \leq w$. This variable is assigned \emph{true}, when the golfer $i$ is scheduled to play in group $k$ in week $l$. The relation to the $\text{GOLFER}_{ijkl}$ in the external constraints is established with the following set of clauses:
+
 \begin{equation}
     \text{GOLFER'}_{ikl} \iff \bigvee \limits_{j=1}^p \text{GOLFER}_{ijkl}
 \end{equation}
 
-- [ ] Ladder Matrix
 
 \section{Symmetry breaking}
 
-As already mentioned when defining the GOLFER variable, our model turns out to be highly symmetrical. Besides ordering weeks, groups and players, we introduced more symmetries by ordering players within a group into certain positions. A model with minimal symmetries would have to model players, weeks and groups as completely interchangeable. However, finding such an encoding might cost more effort than it could be counterbalanced with an efficient non-symmetrical encoding. 
+As already mentioned when defining the GOLFER variable, our model turns out to be highly symmetrical. Besides ordering weeks, groups and players, we introduced more symmetries by ordering players within a group into certain positions. A model with minimal symmetries would have to model players, weeks, groups and positions within as completely interchangeable. However, finding such an encoding might cost more effort than it could be counterbalanced with an efficient non-symmetrical encoding. 
 
-In order to break the symmetry introduced through our encoding, we will add some symmetry-breaking clauses to the encoding. The main idea here is to force entities into a lexographical order. First, we will enforce an increasing numerical order onto players within the same group, by prohibiting assignments where players with indices smaller than the player at a certain position are placed at positions with a higher index than the latter:
+In order to break the symmetry introduced through our encoding, we will add some symmetry-breaking clauses to the encoding. The main idea here is to force entities into a lexicographical order. First, we will enforce an increasing numerical order onto players within the same group, by prohibiting assignments where players with indices smaller than the player at a certain position are placed at positions with a higher index than the latter:
 
 \begin{equation}
 \centering
@@ -253,12 +323,6 @@ Lastly we will break symmetries between weeks. For this, we enforce a lexicograp
     \neg \text{GOLFER}_{m2k(l+1)}
 \end{equation}
 
-- [ ] What are (the) symmetries
-- [ ] How to break symmetries (different methods and their trade-offs)
-    - [ ] Remodeling
-    - [ ] Adding constraints to the model (statically)
-    - [ ] Adding constraints during search (dynamically)
-- [ ] Breaking symmetries for the social golfer
 
 \section{Conclusion}
 
