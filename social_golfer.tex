@@ -278,6 +278,79 @@ Finally we need to link the results of the assignment of our ladder matrix to ou
     \text{GOLFER'}_{ikl} \iff \bigvee \limits_{j=1}^p \text{GOLFER}_{ijkl}
 \end{equation}
 
+We will then relate the $\text{GOLFER'}_{ikl}$ variable to the ladder matrix in such a way, that no golfer plays in the same group as any other golfer more than once. Whenever $\text{GOLFER'}_{ikl}$ and $\text{GOLFER'}_{mkl}$ for some golfers $m$ and $i$ are satisfied, both golfers play in the same group $k$ at the same week $l$. In the ladder matrix, this is indicated by an assignment of \textsc{true} to the entry in the column with the index $i.k$ and the row with the index $i.m$ and an assignment of \textsc{false} of the entry in the next column of the same row. This is done by adding the following group of clauses:
+
+\begin{equation}
+\centering
+    \bigwedge \limits_{l=1}^{w}
+    \bigwedge \limits_{k=1}^{g}
+    \bigwedge \limits_{i=1}^{x-1}
+    \bigwedge \limits_{m=i+1}^{x}
+    (\text{GOLFER'}_{ikl} \wedge \text{GOLFER'}_{mkl}) \to \text{Ladder}_{[{x-1 \choose 2}+m-i](l \times k)}
+\end{equation}
+
+\begin{equation}
+\centering
+    \bigwedge \limits_{l=1}^{w}
+    \bigwedge \limits_{k=1}^{g}
+    \bigwedge \limits_{i=1}^{x-1}
+    \bigwedge \limits_{m=i+1}^{x}
+    (\text{GOLFER'}_{ikl} \wedge \text{GOLFER'}_{mkl}) \to \neg \text{Ladder}_{[{x-1 \choose 2}+m-i](l \times k + 1)}
+\end{equation}
+
+Conversely, whenever the entries of a row for a match of two players change from \textsc{true} to \textsc{false}, the auxilliary \text{GOLFER'} variables for the corresponding golfers need to be set to \textsc{true} accordingly. This can be achieved by adding the following clauses:
+
+\begin{equation}
+\centering
+    \bigwedge \limits_{l=1}^{w}
+    \bigwedge \limits_{k=1}^{g}
+    \bigwedge \limits_{i=1}^{x-1}
+    \bigwedge \limits_{m=i+1}^{x}
+    \Big(
+        \text{Ladder}_{
+            [
+                {x-1 \choose 2}
+                +m-i
+            ](l \times k)
+        }
+        \wedge
+        \neg
+        \text{Ladder}_{
+            [
+                {x-1 \choose 2}
+                +m-i
+            ](l \times k + 1)
+        }
+    \Big)
+    \to
+    \text{GOLFER'}_{ikl}
+\end{equation}
+
+\begin{equation}
+\centering
+    \bigwedge \limits_{l=1}^{w}
+    \bigwedge \limits_{k=1}^{g}
+    \bigwedge \limits_{i=1}^{x-1}
+    \bigwedge \limits_{m=i+1}^{x}
+    \Big(
+        \text{Ladder}_{
+            [
+                {x-1 \choose 2}
+                +m-i
+            ](l \times k)
+        }
+        \wedge
+        \neg
+        \text{Ladder}_{
+            [
+                {x-1 \choose 2}
+                +m-i
+            ](l \times k + 1)
+        }
+    \Big)
+    \to
+    \text{GOLFER'}_{mkl}
+\end{equation}
 
 \section{Symmetry breaking}
 
