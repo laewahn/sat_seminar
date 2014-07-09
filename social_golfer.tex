@@ -6,6 +6,7 @@
 \usepackage{amsmath}
 \usepackage{mdframed}
 \usepackage[table]{xcolor}
+\usepackage{cite}
 
 \title{A symmetry breaking encoding for the social golfer problem}
 \author{Dennis Lewandowski \\
@@ -25,6 +26,8 @@ asdf
 \section{Introduction}
 
 A lot of effort is put into developing faster and better SAT solvers every year. With the solvers becoming more efficient, it becomes more attractive to use SAT solving even for problems that do not occur naturally encoded in SAT, such as combinatorial problems or constraint problems. Transferring non-SAT problems into SAT-problems can yield several inefficiencies. A constraint problem that, stated in its original form, consists of only few constraints can grow into millions of clauses when converted into SAT. Also, converting a problem into SAT , depending on the encoding that was chosen, might result in formulas that are not as intuitively and easy to understand as the original problem and therefore it might be hard to extend the problem to include further constraints and maintain it on the long run.
+% TODO: Loss of structure (linearity, symmetry) kann zu ineffizienz führen [Ramani, Markov]
+% TODO: Motivation - Reduction of known problems for which no solver exists into such where a solver exists
 
 While a lot of research is done on optimizing SAT solvers, a great deal of optimization can be achieved using an optimal encoding of the problem. When choosing an encoding for a problem, one has to make a trade-off between different aspects of the encoding. An encoding could aim be intuitive and understandable. It could be desired to have a minimum set of variables, minimizing the space of possible variable assignments and therefore speeding up computation. It could take into account specific aspects of the very nature of the problem itself, such as symmetries in combinatorial problems.
 
@@ -51,6 +54,7 @@ As the number of weeks, the number of players and the size of the groups in the 
 
 \subsection{Symmetries in Combinatorial Problems}
 
+% TODO: Presence of symmetry leads to redundant search paths which in turn slows down search
 When given a combinatorial problem, in which instances are grouped together following a set of constraints, often times the order of instances within a group is considered irrelevant. Often times, as in the Social Golfer Problem, the order of groups itself is also considered irrelevant. Take for example the following excerpt of a possible assignment for Kirkman's Schoolgirl Problem:
 
 \begin{table}[h]
@@ -91,7 +95,7 @@ Monday & ADH  & BEK & CIO & \emph{GJM} & \emph{FLN}\\
 One can even change the order of entities within each group without making the solution invalid.
 
 % TODO: 'non-solutions' ist crap. Ausserdem genauere Verwendung von 'solutions' und 'assignments'
-The presented assignments are called \emph{symmatrical}. Symmetrical assignments form equivalence classes that will either contain only solutions or no solutions [Smith 2001]. When a partial assignment is proven to lead to no solution, all symmetrical assignments will also lead to no solution. Symmetries within a solution space therefore produce redundant search paths, which slow down backtracking search. When a problem has no solution, the space of possible solutions can be reduced by removing symmetrical non-solutions.
+The presented assignments are called \emph{symmatrical}. Symmetrical assignments form equivalence classes that will either contain only solutions or no solutions\cite{Smith01}. When a partial assignment is proven to lead to no solution, all symmetrical assignments will also lead to no solution. Symmetries within a solution space therefore produce redundant search paths, which slow down backtracking search. When a problem has no solution, the space of possible solutions can be reduced by removing symmetrical non-solutions.
 
 Symmetries can be removed in the following ways:
 
@@ -103,7 +107,7 @@ Symmetries can be removed in the following ways:
 
 The goal of remodeling the problem is to achieve a model that has less inherent symmetries. For example by enumerating the instances or groups within a problem will yield a highly symmetrical solution space, since the entities and groups are modeled as to be distinguishable. Modeling the problem without any symmetries often times leads to the use of variables that are highly abstracted and takes a lot of effort. Often times, the effort of finding a model with no symmetry outnumbers the extra time the solver needs to solve the problem using a model with symmetries.
 
-By adding constraints to the model in order to reduce symmetry, exhaustive search can be speed up, while the original modeling of the problem stays the same. The additional constraints may produce computation overhead, which may in turn negate the effect of a smaller solution space. In turn, due to the additional constraints, first-solution-search can be slowed down significantly [Prestwich].
+By adding constraints to the model in order to reduce symmetry, exhaustive search can be speed up, while the original modeling of the problem stays the same. The additional constraints may produce computation overhead, which may in turn negate the effect of a smaller solution space. In turn, due to the additional constraints, first-solution-search can be slowed down significantly\cite{Prestwich}.
 
 In order to avoid symmetrical equivalent states during search, a specialized solver is needed. Since such a solver produces computation overhead between branching decisions, such a solver would no longer be efficient for solving problems with less to no symmetry.
 
@@ -402,6 +406,25 @@ Lastly we will break symmetries between weeks. For this, we enforce a lexicograp
 \end{equation}
 
 
+\section{Performance}
+
+The goal of intruducing symmetry breaking clauses was to speed up the solution finding process by reducing the search space through the elimination of redundant search pathes. However, eliminating symmetries by adding symmetry breaking clauses, as presented in the previous section, also increases the number of clauses that need to be evaluated on every assignment. How does this influence the overall performance of the SAT solver?
+
+
+\subsection{Performance Impact on Local Search}
+
+For experimental evaluation, Gent et al.\cite{Gent05} had two SAT solvers solve the Social Golfer Problem using the encoding previously presented. The solvers used for evaluation were of the two classes of SAT solvers usually used in practice: Walksat\cite{walksat2004}, a local search solver and Siege\cite{Ryan04}, a DPLL backtracking-based solver.
+
+Walksat starts with by assigning random truth values to the variables of the model. From there on it tries to find a better assignment by randomly flipping the truth assignments of variables in unsatisied clauses. This is done until a satisfying assignment was found.
+
+When used on satisfiable instances of the problem, Walksat was found to perfom significantly slower when using the symmetry breaking model as compared to the model with symmetries. This conforms to the findings of Prestwich\cite{Prestwich}. Prestwich's evaluation of the effect of symmetry breaking for different kinds of SAT solvers showed that symmetry breaking constraints slow down solution finding for local search algorithms and also hybrids of local search and backtracking algorithms. As an interpretation he suggests that, by reducing the solution space, the density of solutions is also reduced, which makes it harder for a local search algorithm to find any first solution. However, the reduced solution space in turn might speed up \emph{exhaustive search}, as there are less solutions overall. As another suggestion he mentions the idea to \emph{maximize} solution symmetries in order to increase the chance of hitting a random assignment that is close to any of the symmetrical solutions right from the beginning.
+
+
+\subsection{Performance Impact on Backtracking}
+
+The other solver, Siege, is a modified version of the DPLL algorithm\cite{DPLL}. Siege uses randomized backtracking search and clause learning. As with Walksat, the symmetry breaking model does not perform as well as the model without symmetry breaking. This is contrary to Prestwich, who reported the effects of symmetry breaking on backtracking solvers to be ``strongly positive''. This again holds only for first-solution search, not for exhaustive search.
+
+
 \section{Conclusion}
 
 - [ ] Removing symmetries can speed up the SAT solving by reducing the
@@ -413,5 +436,7 @@ Lastly we will break symmetries between weeks. For this, we enforce a lexicograp
 - [ ] Social golfer encoding made a trade-off between intuitive model
       and a model suited to avoid symmetries
 
+\bibliographystyle{acm}
+\bibliography{social_golfer}
 
 \end{document}
