@@ -7,6 +7,7 @@
 \usepackage{mdframed}
 \usepackage[table]{xcolor}
 \usepackage{cite}
+\usepackage{url}
 
 \title{A symmetry breaking encoding for the social golfer problem}
 \author{Dennis Lewandowski \\
@@ -27,19 +28,17 @@ The increasing performance of modern SAT solvers encourages the reduction of pro
 
 \section{Introduction}
 
-A lot of effort has been put into developing faster and better SAT solvers in the recent years. With the solvers becoming more efficient, it becomes apparent to use SAT solving for problems where solvers are not as performant, or other problems for which no solver is available. Such problems include combinatorial problems or constraint problems.
+A lot of effort has been put into developing faster and better SAT solvers in the recent years (see \url{http://satcompetition.org/2014/}, \url{http://aclib.net/cssc2014/}). With solvers becoming more efficient, it becomes apparent to use SAT solving for problems where solvers are not as performant, or for which no solver is available. These problems include combinatorial problems or constraint problems.
 
 Modeling a problem into SAT can lead to different inefficiencies. For example, a constraint problem that consists of only few constraints can grow into millions of clauses when encoded into SAT. The SAT encoding might lose important structural features of the problem, such as symmetry or linearity, which can greatly influence the performance of the used solver\cite{ramani}.
 
 While a lot of research is done on optimizing SAT solvers, a great deal of optimization can be achieved using the right encoding for the problem. When choosing an encoding, there are trade-offs to be made between different aspects of the encoding. One could aim for an encoding that is intuitive and easily understandable. It could be desired to have a minimum set of variables, minimizing the space of possible variable assignments and therefore speeding up computation. It could take into account specific features of the problem, such as symmetries in combinatorial problems.
 
-In the following, we will present an encoding for the \emph{Social Golfer Problem}. The encoding will use an intuitive set of variables that allows to state most constraints of the problem in easy readable clauses. It will also preserve the symmetrical nature of the problem. We will then try to eliminate these symmetries and examine the effects this measure has on the performance of different kinds of SAT solvers.
+In the following, we will present an encoding for the \emph{Social Golfer Problem} as proposed by Gent et al.\cite{Gent05}. The encoding will use an intuitive set of variables that allows to state most constraints of the problem in easy readable clauses. It will also preserve the symmetrical nature of the problem. We will then try to eliminate these symmetries and examine the effects this measure has on the performance of different kinds of SAT solvers.
 
 \subsection{The Social Golfer Problem}
 
 The social golfer problem is a famous combinatorial problem. The task is to find a schedule of play for a group of golfers that lasts as many weeks as possible. The constraints for this problem are:
-
-% This paper will take a look into an encoding of the social golfer problem. The social golfer problem presents a class of highly symmetrical combinatorial problems. The original social golfer problem is stated as follows:
 
 \begin{mdframed}[skipabove=\baselineskip, skipbelow=\baselineskip, leftmargin=20, rightmargin=20]
 
@@ -65,78 +64,61 @@ A tuple of $(1,2,(n/2))$ represents the problem of constructing a round-robin sc
 \subsection{Symmetries in Combinatorial Problems}
 
 % TODO: Presence of symmetry leads to redundant search paths which in turn slows down search
-When given a combinatorial problem, in which instances are grouped together following a set of constraints, often times the order of instances within a group is considered irrelevant. Often times, as in the Social Golfer Problem, the order of groups itself is also considered irrelevant. Take for example the following excerpt of a possible assignment for Kirkman's Schoolgirl Problem:
+In many combinatorial it is necessary to group entities together by a given set of constraints. In these cases, the order of entities within such groups can be considered irrelevant. Sometimes even the order of groups is considered irrelevant. Whenever two solutions for a problem can be transformed into each other by exchanging entities within groups, these solutions are called \emph{symmetrical}. Symmetrical solutions build up equivalence classes which either contain only solutions or no solutions\cite{Smith01}.
+
+In the following, we will present an excerpt of a solution for \emph{Kirkman's Schoolgirl Problem}, which we presented in the section before. The presented solution shows the assignment of schoolgirls, denoted by latters from \emph{A} to \emph{O}, into groups of three on two days of the week:
 
 \begin{table}[h]
 \centering
-\begin{tabular}{| l | l | l | l| l | l |}
+\begin{tabular}{ l | l  l  l l  l }
+Day & Group 1 & Group 2 & Group 3 & Group 4 & Group 5 \\
 \hline
 Sunday & ABC & DEF & GHI & JKL & MNO \\
-\hline
 Monday & ADH  & BEK & CIO & FLN & GJM \\
-\hline
 \end{tabular}
 \end{table}
 
-The solution obviously stays valid if the days or the groups are changed within:
+Obviously, the solution stays valid if we change the order of schedules between days:
 
 \begin{table}[h]
 \centering
-\begin{tabular}{| l | l | l | l| l | l |}
+\begin{tabular}{ l | l  l  l l  l }
+Day & Group 1 & Group 2 & Group 3 & Group 4 & Group 5 \\
 \hline
-\emph{Sunday} & ADH  & BEK & CIO & FLN & GJM \\
-\hline
-\emph{Monday} & ABC & DEF & GHI & JKL & MNO \\
-\hline
+Sunday & ADH  & BEK & CIO & FLN & GJM \\
+Monday & ABC & DEF & GHI & JKL & MNO \\
 \end{tabular}
 \end{table}
 
+We can even change the order of groups within every week:
+
 \begin{table}[h]
 \centering
-\begin{tabular}{| l | l | l | l| l | l |}
+\begin{tabular}{ l | l  l  l l  l }
+Day & Group 1 & Group 2 & Group 3 & Group 4 & Group 5 \\
 \hline
 Sunday & \emph{DEF} & \emph{ABC} & GHI & JKL & MNO \\
-\hline
 Monday & ADH  & BEK & CIO & \emph{GJM} & \emph{FLN}\\
-\hline
 \end{tabular}
 \end{table}
 
-One can even change the order of entities within each group without making the solution invalid.
+Symmetries within a solution space produce redundant search paths, which slow down backtracking search. When a partial assignment is proven to lead to an unsatisfying assignment, all symmetrical assignments will also lead to an unsatisfying assignment. This leads to the conclusion that a solver could work more efficient if these symmetrical assignments are ignored by the solver. Removing symmetries also reduces to solution space, which seems beneficial for solvers, as they do not have to make as many assignments compared to a solution space that contains symmetrical solutions.
 
-% TODO: 'non-solutions' ist crap. Ausserdem genauere Verwendung von 'solutions' und 'assignments'
-The presented assignments are called \emph{symmatrical}. Symmetrical assignments form equivalence classes that will either contain only solutions or no solutions\cite{Smith01}. When a partial assignment is proven to lead to no solution, all symmetrical assignments will also lead to no solution. Symmetries within a solution space therefore produce redundant search paths, which slow down backtracking search. When a problem has no solution, the space of possible solutions can be reduced by removing symmetrical non-solutions.
+% TODO: Bild. Solution space einmal mit Symmetrien und einmal ohne.
 
 Symmetries can be removed in the following ways:
 
 \begin{enumerate}
-\item Remodel the problem
-\item Add more constraints to the model
-\item Avoid symmetrically equivalent states during search
+\item \emph{Remodel} the problem
+\item Add more \emph{constraints} to the model
+\item \emph{Avoid} symmetrically equivalent states during search
 \end{enumerate}
 
-The goal of remodeling the problem is to achieve a model that has less inherent symmetries. For example by enumerating the instances or groups within a problem will yield a highly symmetrical solution space, since the entities and groups are modeled as to be distinguishable. Modeling the problem without any symmetries often times leads to the use of variables that are highly abstracted and takes a lot of effort. Often times, the effort of finding a model with no symmetry outnumbers the extra time the solver needs to solve the problem using a model with symmetries.
+The goal of \emph{remodeling} the problem is achieving a model that has less inherent symmetries. For example, enumerating the instances or groups within a problem will yield a highly symmetrical solution space. This is because the entities and groups are modeled distinguishable. Modeling the problem without any symmetries often times leads to the use of highly abstract variables, which takes a lot of effort. The effort of finding a model with no symmetry can outscore the extra time the solver would need to solve the problem using a model that has symmetries.
 
-By adding constraints to the model in order to reduce symmetry, exhaustive search can be speed up, while the original modeling of the problem stays the same. The additional constraints may produce computation overhead, which may in turn negate the effect of a smaller solution space. In turn, due to the additional constraints, first-solution-search can be slowed down significantly\cite{Prestwich}.
+When \emph{adding symmetry breaking constraints} to the model, the original model of the problem stays the same. Additional constraints can produce computation overhead, which may in turn negate the effect of a smaller solution space. First-solution-search can be slowed down significantly, depending on the solver that is used\cite{Prestwich}.
 
-In order to avoid symmetrical equivalent states during search, a specialized solver is needed. Since such a solver produces computation overhead between branching decisions, such a solver would no longer be efficient for solving problems with less to no symmetry.
-
-% SAT Competition 2014 
-%   http://satcompetition.org/2014/ 
-%   http://www.satcompetition.org/
-
-% CSSC 
-%   http://aclib.net/cssc2014/
-
-% https://en.wikipedia.org/wiki/WalkSAT
-% https://en.wikipedia.org/wiki/DPLL_algorithm
-% https://en.wikipedia.org/wiki/SAT_solver#Algorithms_for_solving_SAT
-% https://dl.acm.org/citation.cfm?id=1644330.1644348&coll=DL&dl=GUIDE&CFID=376735803&CFTOKEN=39985701
-% https://dl.acm.org/results.cfm?h=1&cfid=376735803&cftoken=39985701
-% http://www.satlive.org/
-% http://www.satisfiability.org/
-
-
+In order to \emph{avoid symmetrical equivalent states during search}, the solver needs to be able to constantly check for the presence of symmetrical solutions before branching decisions. As this produces computation overhead, such a solver can no longer be efficient for solving problems with less to no symmetry. Therefore, this approach has not found success in SAT solving.
 
 \section{Encoding of the social golfer problem}
 
