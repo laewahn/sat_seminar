@@ -20,24 +20,28 @@
 \maketitle
 
 \begin{abstract}
-asdf
+
+The increasing performance of modern SAT solvers encourages the reduction of problems from other areas, such as combinatorial problems, into SAT problems. To get the best performance, the encoding has to regard features of the problem, such as symmetry, as well as features of the solver. In this paper, we will present and analyze an encoding for the \emph{Social Golfer Problem}, a problem with a high degree of symmetry. We will add symmetry breaking constraints to the encoding and discuss how this effects the performance of different types of solvers. 
+
 \end{abstract}
 
 \section{Introduction}
 
-A lot of effort is put into developing faster and better SAT solvers every year. With the solvers becoming more efficient, it becomes more attractive to use SAT solving even for problems that do not occur naturally encoded in SAT, such as combinatorial problems or constraint problems. Transferring non-SAT problems into SAT-problems can yield several inefficiencies. A constraint problem that, stated in its original form, consists of only few constraints can grow into millions of clauses when converted into SAT. Also, converting a problem into SAT , depending on the encoding that was chosen, might result in formulas that are not as intuitively and easy to understand as the original problem and therefore it might be hard to extend the problem to include further constraints and maintain it on the long run.
-% TODO: Loss of structure (linearity, symmetry) kann zu ineffizienz führen [Ramani, Markov]
-% TODO: Motivation - Reduction of known problems for which no solver exists into such where a solver exists
+A lot of effort has been put into developing faster and better SAT solvers in the recent years. With the solvers becoming more efficient, it becomes apparent to use SAT solving for problems where solvers are not as performant, or other problems for which no solver is available. Such problems include combinatorial problems or constraint problems.
 
-While a lot of research is done on optimizing SAT solvers, a great deal of optimization can be achieved using an optimal encoding of the problem. When choosing an encoding for a problem, one has to make a trade-off between different aspects of the encoding. An encoding could aim be intuitive and understandable. It could be desired to have a minimum set of variables, minimizing the space of possible variable assignments and therefore speeding up computation. It could take into account specific aspects of the very nature of the problem itself, such as symmetries in combinatorial problems.
+Modeling a problem into SAT can lead to different inefficiencies. For example, a constraint problem that consists of only few constraints can grow into millions of clauses when encoded into SAT. The SAT encoding might lose important structural features of the problem, such as symmetry or linearity, which can greatly influence the performance of the used solver\cite{ramani}.
+
+While a lot of research is done on optimizing SAT solvers, a great deal of optimization can be achieved using the right encoding for the problem. When choosing an encoding, there are trade-offs to be made between different aspects of the encoding. One could aim for an encoding that is intuitive and easily understandable. It could be desired to have a minimum set of variables, minimizing the space of possible variable assignments and therefore speeding up computation. It could take into account specific features of the problem, such as symmetries in combinatorial problems.
+
+In the following, we will present an encoding for the \emph{Social Golfer Problem}. The encoding will use an intuitive set of variables that allows to state most constraints of the problem in easy readable clauses. It will also preserve the symmetrical nature of the problem. We will then try to eliminate these symmetries and examine the effects this measure has on the performance of different kinds of SAT solvers.
 
 \subsection{The Social Golfer Problem}
 
-This paper will take a look into an encoding of the social golfer problem. The social golfer problem presents a class of highly symmetrical combinatorial problems. The original social golfer problem is stated as follows:
+The social golfer problem is a famous combinatorial problem. The task is to find a schedule of play for a group of golfers that lasts as many weeks as possible. The constraints for this problem are:
+
+% This paper will take a look into an encoding of the social golfer problem. The social golfer problem presents a class of highly symmetrical combinatorial problems. The original social golfer problem is stated as follows:
 
 \begin{mdframed}[skipabove=\baselineskip, skipbelow=\baselineskip, leftmargin=20, rightmargin=20]
-
-Given the following constraints, find a schedule of play for these golfers for as many weeks as possible:
 
 \begin{enumerate}
     \item A golf club has 32 members.
@@ -48,9 +52,15 @@ Given the following constraints, find a schedule of play for these golfers for a
 
 \end{mdframed}
 
-% TODO: Mehr sinnvolle w-p-g Tupel finden...
-As the number of weeks, the number of players and the size of the groups in the original problem is generalizable into a triple w-p-g, with w being the number of weeks to play, p being the number of players per group and g being the number of groups. By entering distinct values into the triple, one can construct other well known combinatorial problems. A tuple of 1-2-(n/2) represents the problem of constructing a round-robin tournament schedule, where n is the number of overall players. Another tuple for a well known problem is 7-3-5, which resembles Kirkman's Schoolgirl Problem: ``Fifteen young ladies in a school walk out three abreast for seven days in succession: it is required to arrange them daily so that no two shall walk twice abreast.''. The Social Golfer Problem itself is described by the tuple w-4-8. The overall goal is to find a maximal value for w. With 32 players and each player facing 3 new other players each week, w can not be greater than 10.
+The number of weeks, players and the size of groups are generalizable. The general problem is characterized a triple $(w,p,g)$, where $w$ is the number of weeks, $p$ is the number of players per group and $g$ is the number of groups playing. The general Social Golfer Problem represents a class of different combinatorial problems. One example of a concrete problem from this class of problems is \emph{Kirkman's Schoolgirl Problem}, given by the tuple $(7,3,5)$:
 
+\begin{mdframed}[skipabove=\baselineskip, skipbelow=\baselineskip, leftmargin=20, rightmargin=20]
+
+Fifteen young ladies in a school walk out three abreast for seven days in succession: it is required to arrange them daily so that no two shall walk twice abreast.
+
+\end{mdframed}
+
+A tuple of $(1,2,(n/2))$ represents the problem of constructing a round-robin schedule for a two-player tournament, where $n$ is the number of players. The Social Golfer Problem itself is described by the tuple $(w,4,8)$. The overall goal is to find a maximal value for $w$. With 32 players and each player facing 3 new other players each week, $w$ can not be greater than 10. Since a solution for a 9 weeks schedule has already been posted, we will concentrate on finding a solution for 10 weeks.
 
 \subsection{Symmetries in Combinatorial Problems}
 
@@ -427,14 +437,15 @@ The other solver, Siege, is a modified version of the DPLL algorithm\cite{DPLL}.
 
 \section{Conclusion}
 
-- [ ] Removing symmetries can speed up the SAT solving by reducing the
-      solution space
-- [ ] Removing symmetries adds extra costs to the modeling process
-    - [ ] Trade-off: costs for eliminating symmetries vs. cost for
-          longer run of solver
-    - [ ] Does not always pay off (as results in the paper show)
-- [ ] Social golfer encoding made a trade-off between intuitive model
-      and a model suited to avoid symmetries
+In this paper we explored an encoding for the Social Golfer Problem. As the problem was highly symmetrical, we took measures to remove these symmetries in the encoding. This was done by adding symmetry breaking constraints to the model. We then discussed the effects that symmetry breaking has on the performance of the different kinds of SAT solvers.
+
+The presented encoding for the Social Golfer Problem used an intuitive variable set that allowed most constraints to be encoded into ``at least one'' and ``at most one'' clauses. The encoding introduced a lot of symmetries since it enumerated weeks, groups and golfers, and even added more symmetries by enumerating positions of golfers within teams. This enumerating led to an increased number of symmetry breaking clauses.
+
+One of the main findings of the performance discussion is that the performance of a solver is depending on the encoding used for a problem and the kind of solution that is requested. For first solution search, on one hand symmetry breaking tends to have positive effects on the performance of backtracking algorithms, but strongly negative effects on local search algorithms. On the other hands, there are examples where the costs of added constraints for symmetry breaking does not pay back in solver performance, as it was with the encoding discussed in this paper.
+
+A way to remove symmetries, without the additional costs of symmetry breaking clauses, would be to model the problem in a way that entities of problem are treated as interchangeably. However, it is often not possible to find a model which removes all symmetries.
+
+Finally, the presented encoding made a trade-off between being understandable and being performant. It was tried to buy back performance that was lost in the encoding by adding symmetry breaking constraints. Adding these constraints did not pay of, but rather showed that the choice of an encoding can have a significant impact on the performance of the solver.
 
 \bibliographystyle{acm}
 \bibliography{social_golfer}
