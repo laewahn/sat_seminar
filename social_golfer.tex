@@ -129,13 +129,11 @@ The second group of constraints deals with the rule that each golfer is only all
 
 \subsection{Modeling external constraints}
 
-In order to model the Social Golfer Problem, we first need to define a model that represents whether a certain golfer plays in a certain week within a certain group. In addition to this, our model will also state that a given golfer is at a certain position within a group. With respect to eliminating symmetries within the model, this is certainly counter-intuitive. By introducing any kind of order into a set of changeable entities, symmetries will be introduced. However, modeling it this way allows to state most constraints as at-most-one and at-least-one clauses, making the constraints more intuitive.
+In order to model the Social Golfer Problem, we first need to define a model that represents whether a certain golfer plays in a certain week within a certain group. In addition to this, our model will also state that a given golfer is at a certain position within a group. With respect to our ambition of eliminating symmetries within the model, this seems certainly contradictory, since introducing any kind of order into a set of exchangeable entities will introduce additional symmetries. However, this way of modeling allows to state most of the constraints as ``at-most-one'' and ``at-least-one'' clauses, making the constraints themselve more intuitive.
 
 Let $x = p \times g$ be the number of players. The first variable introduced to our model is $\text{GOLFER}_{ijkl}$, with $1 \leq i \leq x$, $1 \leq j \leq p$, $1 \leq k \leq g$ and $1 \leq l \leq w$.
 
-
-
-The fact that each golfer plays in at least one group every week is modeled as follows:
+The constraint that each golfer plays in at least one group every week is expressed in the following way:
 
 \begin{equation}
 \label{form:everyone_plays}
@@ -148,6 +146,7 @@ The fact that each golfer plays in at least one group every week is modeled as f
     \text{GOLFER}_{ijkl}
 \end{equation}
 
+\pagebreak
 To make sure that no golfer is assigned to more than on position inside a group, we'll add the following clauses:
 
 \begin{equation}
@@ -165,7 +164,7 @@ To make sure that no golfer is assigned to more than on position inside a group,
     \neg \text{GOLFER}_{imkl}
 \end{equation}
 
-To make sure that no golfer plays in more than one group within the same week, the following clauses are added:
+The following clauses encode that no golfer plays in more than one group within the same week:
 
 \begin{equation}
 % When a golfer plays at a position inside a group within one week, he cannot play at any position and group in the same week
@@ -196,7 +195,7 @@ The next set of clauses ensures that every position in each group within each we
 \end{equation}
 
 
-Finally, the following set of clauses ensure that each position within each group is at most taken by one golfer.
+Finally, the following set of clauses ensures that each position within each group is at most taken by one golfer.
 
 \begin{equation}
 % If within a week within a group a position is already taken by a golfer, this position can not be taken by another golfer
