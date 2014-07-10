@@ -27,6 +27,11 @@ The increasing performance of modern SAT solvers encourages the reduction of pro
 
 \end{abstract}
 
+% !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+% TODO: Alle GOLFER in small caps!
+% TODO: Gucken ob Social Golfer überall gleich geschrieben ist
+% TODO: Gucken ob alle Sätze mit einem Punkt enden
+
 \section{Introduction}
 
 A lot of effort has been put into developing faster and better SAT solvers in the recent years (see \url{http://satcompetition.org/2014/}, \url{http://aclib.net/cssc2014/}). With solvers becoming more efficient, it becomes apparent to use SAT solving for problems where solvers are not as performant, or for which no solver is available. These problems include combinatorial problems or constraint problems.
@@ -64,7 +69,6 @@ A tuple of $(1,2,(n/2))$ represents the problem of constructing a round-robin sc
 
 \subsection{Symmetries in Combinatorial Problems}
 
-% TODO: Presence of symmetry leads to redundant search paths which in turn slows down search
 In many combinatorial it is necessary to group entities together by a given set of constraints. In these cases, the order of entities within such groups can be considered irrelevant. Sometimes even the order of groups is considered irrelevant. Whenever two solutions for a problem can be transformed into each other by exchanging entities within groups, these solutions are called \emph{symmetrical}. Symmetrical solutions build up equivalence classes which either contain only solutions or no solutions\cite{Smith01}.
 
 In the following, we will present an excerpt of a solution for \emph{Kirkman's Schoolgirl Problem}, which we presented in the section before. The presented solution shows the assignment of schoolgirls, denoted by letters from \emph{A} to \emph{O}, into groups of three on two days of the week:
@@ -105,7 +109,7 @@ Monday & ADH  & BEK & CIO & \emph{GJM} & \emph{FLN}\\
 
 Symmetries within a solution space produce redundant search paths, which slow down backtracking search. When a partial assignment is proven to lead to an unsatisfying assignment, all symmetrical assignments will also lead to an unsatisfying assignment. This leads to the conclusion that a solver could work more efficient if these symmetrical assignments are ignored by the solver. Removing symmetries also reduces to solution space, which seems beneficial for solvers, as they do not have to make as many assignments compared to a solution space that contains symmetrical solutions.
 
-% TODO: Bild. Solution space einmal mit Symmetrien und einmal ohne.
+% TODO: Noch einmal die Caption anschauen und was besseres schreiben
 \begin{figure}[h!]
 \centering
     \includegraphics[width=13.6cm]{images/symmetry_breaking}
