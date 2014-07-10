@@ -1,13 +1,14 @@
 \documentclass[a4paper]{scrartcl}
 
 \usepackage{balance}  % to better equalize the last page
-\usepackage{graphics} % for EPS, load graphicx instead
+\usepackage{graphicx} % for EPS, load graphicx instead
 \usepackage{url}      % llt: nicely formatted URLs
 \usepackage{amsmath}
 \usepackage{mdframed}
 \usepackage[table]{xcolor}
 \usepackage{cite}
 \usepackage{url}
+
 
 \title{A symmetry breaking encoding for the social golfer problem}
 \author{Dennis Lewandowski \\
@@ -105,6 +106,11 @@ Monday & ADH  & BEK & CIO & \emph{GJM} & \emph{FLN}\\
 Symmetries within a solution space produce redundant search paths, which slow down backtracking search. When a partial assignment is proven to lead to an unsatisfying assignment, all symmetrical assignments will also lead to an unsatisfying assignment. This leads to the conclusion that a solver could work more efficient if these symmetrical assignments are ignored by the solver. Removing symmetries also reduces to solution space, which seems beneficial for solvers, as they do not have to make as many assignments compared to a solution space that contains symmetrical solutions.
 
 % TODO: Bild. Solution space einmal mit Symmetrien und einmal ohne.
+\begin{figure}[h!]
+\centering
+    \includegraphics[width=13.6cm]{images/symmetry_breaking}
+    \caption{An illustration of how symmetry breaking reduces the solution space: A and B present partial symmetrical assignments that are unsatisfying. Removing any following symmetrical assignments drastically reduces the overall solution space.}
+\end{figure}
 
 Symmetries can be removed in the following ways:
 
@@ -146,7 +152,6 @@ The constraint that each golfer plays in at least one group every week is expres
     \text{GOLFER}_{ijkl}
 \end{equation}
 
-\pagebreak
 To make sure that no golfer is assigned to more than on position inside a group, we'll add the following clauses:
 
 \begin{equation}
@@ -404,9 +409,9 @@ The goal of introducing symmetry breaking clauses was to speed up the solution f
 
 \subsection{Performance Impact on Local Search}
 
-For experimental evaluation, Gent et al.\cite{Gent05} had two SAT solvers solve the Social Golfer Problem using the encoding previously presented. The solvers used for evaluation were of the two classes of SAT solvers usually used in practice: Walksat\cite{walksat2004}, a local search solver and Siege\cite{Ryan04}, a DPLL backtracking-based solver.
+For experimental evaluation of the presented encoding, Gent et al. used two different SAT solvers. The solvers are instance of the two classes of SAT solvers that are usually used in practice: Walksat\cite{walksat2004}, a local search solver, and Siege\cite{Ryan04}, a DPLL backtracking-based solver.
 
-Walksat starts with by assigning random truth values to the variables of the model. From there on it tries to find a better assignment by randomly flipping the truth assignments of variables in unsatisfied clauses. This is done until a satisfying assignment was found.
+Walksat works by starting with an assigning random truth values to the variables of the model. From this assignment on it tries to find a better assignment by randomly flipping the truth assignments of variables in unsatisfied clauses. This is done until a satisfying assignment is found.
 
 When used on satisfiable instances of the problem, Walksat was found to perform significantly slower when using the symmetry breaking model as compared to the model with symmetries. This conforms to the findings of Prestwich\cite{Prestwich}. Prestwich's evaluation of the effect of symmetry breaking for different kinds of SAT solvers showed that symmetry breaking constraints slow down solution finding for local search algorithms and also hybrids of local search and backtracking algorithms. As an interpretation he suggests that, by reducing the solution space, the density of solutions is also reduced, which makes it harder for a local search algorithm to find any first solution. However, the reduced solution space in turn might speed up \emph{exhaustive search}, as there are less solutions overall. As another suggestion he mentions the idea to \emph{maximize} solution symmetries in order to increase the chance of hitting a random assignment that is close to any of the symmetrical solutions right from the beginning.
 
