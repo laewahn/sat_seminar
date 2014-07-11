@@ -10,7 +10,7 @@
 \usepackage{url}
 
 
-\title{A symmetry breaking encoding for the social golfer problem}
+\title{A symmetry breaking SAT encoding for the social golfer problem}
 \author{Dennis Lewandowski \\
     RWTH Aachen University \\
     Seminar: Satisfiability Checking
@@ -27,14 +27,9 @@ The increasing performance of modern SAT solvers encourages the reduction of pro
 
 \end{abstract}
 
-% !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-% TODO: Alle GOLFER in small caps!
-% TODO: Gucken ob Social Golfer überall gleich geschrieben ist
-% TODO: Gucken ob alle Sätze mit einem Punkt enden
-
 \section{Introduction}
 
-A lot of effort has been put into developing faster and better SAT solvers in the recent years (see \url{http://satcompetition.org/2014/}, \url{http://aclib.net/cssc2014/}). With solvers becoming more efficient, it becomes apparent to use SAT solving for problems where solvers are not as performant, or for which no solver is available. These problems include combinatorial problems or constraint problems.
+A lot of effort has been put into developing faster and better SAT solvers in the recent years (\url{http://satcompetition.org/2014/}, \url{http://aclib.net/cssc2014/}). With solvers becoming more efficient, it becomes apparent to use SAT solving for problems where solvers are not as performant, or for which no solver is available. These problems include combinatorial problems or constraint problems.
 
 Modeling a problem into SAT can lead to different inefficiencies. For example, a constraint problem that consists of only few constraints can grow into millions of clauses when encoded into SAT. The SAT encoding might lose important structural features of the problem, such as symmetry or linearity, which can greatly influence the performance of the used solver\cite{ramani}.
 
@@ -44,7 +39,7 @@ In the following, we will present an encoding for the \emph{Social Golfer Proble
 
 \subsection{The Social Golfer Problem}
 
-The social golfer problem is a famous combinatorial problem. The task is to find a schedule of play for a group of golfers that lasts as many weeks as possible. The constraints for this problem are:
+The Social Golfer Problem is a famous combinatorial problem. The task is to find a schedule of play for a group of golfers that lasts as many weeks as possible. The constraints for this problem are:
 
 \begin{mdframed}[skipabove=\baselineskip, skipbelow=\baselineskip, leftmargin=20, rightmargin=20]
 
@@ -90,8 +85,8 @@ Obviously, the solution stays valid if we change the order of schedules between 
 \begin{tabular}{ l | l  l  l l  l }
 Day & Group 1 & Group 2 & Group 3 & Group 4 & Group 5 \\
 \hline
-Sunday & ADH  & BEK & CIO & FLN & GJM \\
-Monday & ABC & DEF & GHI & JKL & MNO \\
+\emph{Sunday} & ADH  & BEK & CIO & FLN & GJM \\
+\emph{Monday} & ABC & DEF & GHI & JKL & MNO \\
 \end{tabular}
 \end{table}
 
@@ -109,12 +104,13 @@ Monday & ADH  & BEK & CIO & \emph{GJM} & \emph{FLN}\\
 
 Symmetries within a solution space produce redundant search paths, which slow down backtracking search. When a partial assignment is proven to lead to an unsatisfying assignment, all symmetrical assignments will also lead to an unsatisfying assignment. This leads to the conclusion that a solver could work more efficient if these symmetrical assignments are ignored by the solver. Removing symmetries also reduces to solution space, which seems beneficial for solvers, as they do not have to make as many assignments compared to a solution space that contains symmetrical solutions.
 
-% TODO: Noch einmal die Caption anschauen und was besseres schreiben
 \begin{figure}[h!]
 \centering
     \includegraphics[width=13.6cm]{images/symmetry_breaking}
-    \caption{An illustration of how symmetry breaking reduces the solution space: A and B present partial symmetrical assignments that are unsatisfying. Removing any following symmetrical assignments drastically reduces the overall solution space.}
+    \caption{An illustration of how symmetry breaking reduces the solution space: A and B present partial symmetrical assignments that are unsatisfying. Removing any following symmetrical assignments reduces the overall solution space.}
 \end{figure}
+
+\pagebreak
 
 Symmetries can be removed in the following ways:
 
@@ -130,7 +126,7 @@ When \emph{adding symmetry breaking constraints} to the model, the original mode
 
 In order to \emph{avoid symmetrical equivalent states during search}, the solver needs to be able to constantly check for the presence of symmetrical solutions before branching decisions. As this produces computation overhead, such a solver can no longer be efficient for solving problems with less to no symmetry. Therefore, this approach has not found success in SAT solving.
 
-\section{Encoding of the social golfer problem}
+\section{Encoding of the Social Golfer Problem}
 
 In this section we encode the constraints of the Social Golfer Problem. The first group of constraints deals with the number of groups a golfer can be assigned to, the number of weeks that a group can be assigned to, et cetera. We will refer to this as \emph{``external constraints''}, as they set the framework within which we can assign golfers to groups and groups to weeks.
 
@@ -141,7 +137,7 @@ The second group of constraints deals with the rule that each golfer is only all
 
 In order to model the Social Golfer Problem, we first need to define a model that represents whether a certain golfer plays in a certain week within a certain group. In addition to this, our model will also state that a given golfer is at a certain position within a group. With respect to our ambition of eliminating symmetries within the model, this seems certainly contradictory, since introducing any kind of order into a set of exchangeable entities will introduce additional symmetries. However, this way of modeling allows to state most of the constraints as ``at-most-one'' and ``at-least-one'' clauses, making the constraints themselve more intuitive.
 
-Let $x = p \times g$ be the number of players. The first variable introduced to our model is $\text{GOLFER}_{ijkl}$, with $1 \leq i \leq x$, $1 \leq j \leq p$, $1 \leq k \leq g$ and $1 \leq l \leq w$.
+Let $x = p \times g$ be the number of players. The first variable introduced to our model is $\textsc{Golfer}_{ijkl}$, with $1 \leq i \leq x$, $1 \leq j \leq p$, $1 \leq k \leq g$ and $1 \leq l \leq w$.
 
 The constraint that each golfer plays in at least one group every week is expressed in the following way:
 
@@ -153,7 +149,7 @@ The constraint that each golfer plays in at least one group every week is expres
     \bigwedge \limits_{l=1}^w 
     \bigvee \limits_{j=1}^p
     \bigvee \limits_{k=1}^g 
-    \text{GOLFER}_{ijkl}
+    \textsc{Golfer}_{ijkl}
 \end{equation}
 
 To make sure that no golfer is assigned to more than on position inside a group, we'll add the following clauses:
@@ -167,10 +163,10 @@ To make sure that no golfer is assigned to more than on position inside a group,
     \bigwedge \limits_{k=1}^g 
     \bigwedge \limits_{m=j+1}^p 
     % \neg 
-    \text{GOLFER}_{ijkl} 
+    \textsc{Golfer}_{ijkl} 
     \to
     % \vee 
-    \neg \text{GOLFER}_{imkl}
+    \neg \textsc{Golfer}_{imkl}
 \end{equation}
 
 The following clauses encode that no golfer plays in more than one group within the same week:
@@ -185,10 +181,10 @@ The following clauses encode that no golfer plays in more than one group within 
     \bigwedge \limits_{m=k+1}^g 
     \bigwedge \limits_{n=j+1}^p 
     % \neg 
-    \text{GOLFER}_{ijkl} 
+    \textsc{Golfer}_{ijkl} 
     \to
     % \vee 
-    \neg \text{GOLFER}_{inml}
+    \neg \textsc{Golfer}_{inml}
 \end{equation}
 
 The next set of clauses ensures that every position in each group within each week is assigned to at least one golfer.
@@ -200,7 +196,7 @@ The next set of clauses ensures that every position in each group within each we
     \bigwedge \limits_{k=1}^g 
     \bigwedge \limits_{j=1}^p
     \bigvee \limits_{i=1}^x 
-    \text{GOLFER}_{ijkl}
+    \textsc{Golfer}_{ijkl}
 \end{equation}
 
 
@@ -215,10 +211,10 @@ Finally, the following set of clauses ensures that each position within each gro
     \bigwedge \limits_{i=1}^x 
     \bigwedge \limits_{m=i+1}^x 
     % \neg 
-    \text{GOLFER}_{ijkl} 
+    \textsc{Golfer}_{ijkl} 
     \to
     % \vee 
-    \neg \text{GOLFER}_{imkl}
+    \neg \textsc{Golfer}_{imkl}
 \end{equation}
 
 
@@ -253,7 +249,7 @@ A ladder matrix is built with a set of auxiliary boolean ladder variables. The l
 
 Because we constructed variables for exactly ${x \choose 2}$, we end up with a set of all combinations of weeks and groups for each unique pair of two players. The next thing we need to do is to make sure that once a pair of players is assigned into one group within one week, this pair is not assigned any other group in any other week.
 
-Consider the ladder variables for a fixed pair of players. We define such a row to be valid if and only if it is built of a sequence of zero or more true assignments, followed only by false assignments. So once a ladder variable within a row is set to false, each subsequent variable must also be false. This is achieved by adding clause \ref{ladder:propagation}:
+Consider the ladder variables for a fixed pair of players. We define such a row to be valid if and only if it is built of a sequence of zero or more \textsc{true} assignments, followed only by \textsc{false} assignments. So once a ladder variable within a row is set to \textsc{false}, each subsequent variable must also be \textsc{false}. This is achieved by adding clause \ref{ladder:propagation}:
 
 \begin{equation}
 \label{ladder:propagation}
@@ -265,7 +261,7 @@ Consider the ladder variables for a fixed pair of players. We define such a row 
     \text{Ladder}_{yz}
 \end{equation}
 
-Given this encoding, we define that a pair of players is assigned a group $k$ and a week $l$ when the ladder variable in their respective row is false for the first time. As an example consider the following assignment of ladder variables for the match between the players 1 and 2:
+Given this encoding, we define that a pair of players is assigned a group $k$ and a week $l$ when the ladder variable in their respective row is \textsc{false} for the first time. As an example consider the following assignment of ladder variables for the match between the players 1 and 2:
 
 \begin{table}[h]
 \centering
@@ -276,27 +272,18 @@ Given this encoding, we define that a pair of players is assigned a group $k$ an
 \end{tabular}
 \end{table}
 
-With respect to \ref{ladder:propagation} this is a valid assignment of ladder variables. The change from true assignments to false assignments from column 2.1 to column 2.2 (emphasized in bold) schedules player 1 and 2 to play within group 1 in week 2. Because of \ref{ladder:propagation} it is no longer possible to schedule this pair of players to another group in another week. So no golfer can play with another golfer in the same group more than once.
+With respect to \ref{ladder:propagation} this is a valid assignment of ladder variables. The change from \textsc{true} assignments to \textsc{false} assignments from column 2.1 to column 2.2 (emphasized in bold) schedules player 1 and 2 to play within group 1 in week 2. Because of \ref{ladder:propagation} it is no longer possible to schedule this pair of players to another group in another week. So no golfer can play with another golfer in the same group more than once.
 
 
-\subsection{Matching entries of the ladder matrix to the $\text{GOLFER}$ variable}
+\subsection{Matching entries of the ladder matrix to the $\textsc{Golfer}$ variable}
 
-Finally we need to link the results of the assignment of our ladder matrix to our set of external constraints. First, we introduce an auxiliary variable $\text{GOLFER'}_{ikl}$, with $1 \leq i \leq x$, $1 \leq k \leq g$ and $1 \leq l \leq w$. This variable is assigned \emph{true}, when the golfer $i$ is scheduled to play in group $k$ in week $l$. The relation to the $\text{GOLFER}_{ijkl}$ in the external constraints is established with the following set of clauses:
-
-\begin{equation}
-    \text{GOLFER'}_{ikl} \iff \bigvee \limits_{j=1}^p \text{GOLFER}_{ijkl}
-\end{equation}
-
-We will then relate the $\text{GOLFER'}_{ikl}$ variable to the ladder matrix in such a way, that no golfer plays in the same group as any other golfer more than once. Whenever $\text{GOLFER'}_{ikl}$ and $\text{GOLFER'}_{mkl}$ for some golfers $m$ and $i$ are satisfied, both golfers play in the same group $k$ at the same week $l$. In the ladder matrix, this is indicated by an assignment of \textsc{true} to the entry in the column with the index $i.k$ and the row with the index $i.m$ and an assignment of \textsc{false} of the entry in the next column of the same row. This is done by adding the following group of clauses:
+Finally we need to link the results of the assignment of our ladder matrix to our set of external constraints. First, we introduce an auxiliary variable $\textsc{Golfer'}_{ikl}$, with $1 \leq i \leq x$, $1 \leq k \leq g$ and $1 \leq l \leq w$. This variable is assigned \textsc{true}, when the golfer $i$ is scheduled to play in group $k$ in week $l$. The relation to the $\textsc{Golfer}_{ijkl}$ in the external constraints is established with the following set of clauses:
 
 \begin{equation}
-\centering
-    \bigwedge \limits_{l=1}^{w}
-    \bigwedge \limits_{k=1}^{g}
-    \bigwedge \limits_{i=1}^{x-1}
-    \bigwedge \limits_{m=i+1}^{x}
-    (\text{GOLFER'}_{ikl} \wedge \text{GOLFER'}_{mkl}) \to \text{Ladder}_{[{x-1 \choose 2}+m-i](l \times k)}
+    \textsc{Golfer'}_{ikl} \iff \bigvee \limits_{j=1}^p \textsc{Golfer}_{ijkl}
 \end{equation}
+
+We will then relate the $\textsc{Golfer'}_{ikl}$ variable to the ladder matrix in such a way, that no golfer plays in the same group as any other golfer more than once. Whenever $\textsc{Golfer'}_{ikl}$ and $\textsc{Golfer'}_{mkl}$ for some golfers $m$ and $i$ are satisfied, both golfers play in the same group $k$ at the same week $l$. In the ladder matrix, this is indicated by an assignment of \textsc{true} to the entry in the column with the index $i.k$ and the row with the index $i.m$ and an assignment of \textsc{false} of the entry in the next column of the same row. This is done by adding the following group of clauses:
 
 \begin{equation}
 \centering
@@ -304,10 +291,8 @@ We will then relate the $\text{GOLFER'}_{ikl}$ variable to the ladder matrix in 
     \bigwedge \limits_{k=1}^{g}
     \bigwedge \limits_{i=1}^{x-1}
     \bigwedge \limits_{m=i+1}^{x}
-    (\text{GOLFER'}_{ikl} \wedge \text{GOLFER'}_{mkl}) \to \neg \text{Ladder}_{[{x-1 \choose 2}+m-i](l \times k + 1)}
+    (\textsc{Golfer'}_{ikl} \wedge \textsc{Golfer'}_{mkl}) \to \text{Ladder}_{[{x-1 \choose 2}+m-i](l \times k)}
 \end{equation}
-
-Conversely, whenever the entries of a row for a match of two players change from \textsc{true} to \textsc{false}, the auxiliary \text{GOLFER'} variables for the corresponding golfers need to be set to \textsc{true} accordingly. This can be achieved by adding the following clauses:
 
 \begin{equation}
 \centering
@@ -315,25 +300,10 @@ Conversely, whenever the entries of a row for a match of two players change from
     \bigwedge \limits_{k=1}^{g}
     \bigwedge \limits_{i=1}^{x-1}
     \bigwedge \limits_{m=i+1}^{x}
-    \Big(
-        \text{Ladder}_{
-            [
-                {x-1 \choose 2}
-                +m-i
-            ](l \times k)
-        }
-        \wedge
-        \neg
-        \text{Ladder}_{
-            [
-                {x-1 \choose 2}
-                +m-i
-            ](l \times k + 1)
-        }
-    \Big)
-    \to
-    \text{GOLFER'}_{ikl}
+    (\textsc{Golfer'}_{ikl} \wedge \textsc{Golfer'}_{mkl}) \to \neg \text{Ladder}_{[{x-1 \choose 2}+m-i](l \times k + 1)}
 \end{equation}
+
+Conversely, whenever the entries of a row for a match of two players change from \textsc{true} to \textsc{false}, the auxiliary \textsc{Golfer'} variables for the corresponding golfers need to be set to \textsc{true} accordingly. This can be achieved by adding the following clauses:
 
 \begin{equation}
 \centering
@@ -358,12 +328,38 @@ Conversely, whenever the entries of a row for a match of two players change from
         }
     \Big)
     \to
-    \text{GOLFER'}_{mkl}
+    \textsc{Golfer'}_{ikl}
+\end{equation}
+
+\begin{equation}
+\centering
+    \bigwedge \limits_{l=1}^{w}
+    \bigwedge \limits_{k=1}^{g}
+    \bigwedge \limits_{i=1}^{x-1}
+    \bigwedge \limits_{m=i+1}^{x}
+    \Big(
+        \text{Ladder}_{
+            [
+                {x-1 \choose 2}
+                +m-i
+            ](l \times k)
+        }
+        \wedge
+        \neg
+        \text{Ladder}_{
+            [
+                {x-1 \choose 2}
+                +m-i
+            ](l \times k + 1)
+        }
+    \Big)
+    \to
+    \textsc{Golfer'}_{mkl}
 \end{equation}
 
 \section{Symmetry breaking}
 
-As already mentioned when defining the GOLFER variable, our model turns out to be highly symmetrical. Besides ordering weeks, groups and players, we introduced more symmetries by ordering players within a group into certain positions. A model with minimal symmetries would have to model players, weeks, groups and positions within as completely interchangeable. However, finding such an encoding might cost more effort than it could be counterbalanced with an efficient non-symmetrical encoding. 
+As already mentioned when defining the \textsc{Golfer} variable, our model turns out to be highly symmetrical. Besides ordering weeks, groups and players, we introduced more symmetries by ordering players within a group into certain positions. A model with minimal symmetries would have to model players, weeks, groups and positions within as completely interchangeable. However, finding such an encoding might cost more effort than it could be counterbalanced with an efficient non-symmetrical encoding. 
 
 In order to break the symmetry introduced through our encoding, we will add some symmetry-breaking clauses to the encoding. The main idea here is to force entities into a lexicographical order. First, we will enforce an increasing numerical order onto players within the same group, by prohibiting assignments where players with indices smaller than the player at a certain position are placed at positions with a higher index than the latter:
 
@@ -374,9 +370,9 @@ In order to break the symmetry introduced through our encoding, we will add some
     \bigwedge \limits_{k=1}^g
     \bigwedge \limits_{l=1}^w
     \bigwedge \limits_{m=1}^{i-1}
-    \text{GOLFER}_{ijkl}
+    \textsc{Golfer}_{ijkl}
     \to
-    \neg \text{GOLFER}_{m(j+1)kl}
+    \neg \textsc{Golfer}_{m(j+1)kl}
 \end{equation}
 
 More symmetries can be broken by forcing the first players of each group within one week into a lexicographical order. This is achieved by setting golfer number 1 as the first golfer in the first group within every week. Further we disallow assignments where golfers with a smaller index than the first golfer within a group are assigned the first golfer in a group with a bigger index than the latter:
@@ -387,9 +383,9 @@ More symmetries can be broken by forcing the first players of each group within 
     \bigwedge \limits_{k=1}^g
     \bigwedge \limits_{l=1}^w
     \bigwedge \limits_{m=1}^{i-1}
-    \text{GOLFER}_{i1kl}
+    \textsc{Golfer}_{i1kl}
     \to
-    \neg \text{GOLFER}_{m1(k+1)l}
+    \neg \textsc{Golfer}_{m1(k+1)l}
 \end{equation}
 
 Lastly we will break symmetries between weeks. For this, we enforce a lexicographical order onto the second players within each group between weeks in a manner similar to the ones before:
@@ -400,15 +396,15 @@ Lastly we will break symmetries between weeks. For this, we enforce a lexicograp
     \bigwedge \limits_{k=1}^g
     \bigwedge \limits_{l=1}^w
     \bigwedge \limits_{m=1}^{i-1}
-    \text{GOLFER}_{i2kl}
+    \textsc{Golfer}_{i2kl}
     \to
-    \neg \text{GOLFER}_{m2k(l+1)}
+    \neg \textsc{Golfer}_{m2k(l+1)}
 \end{equation}
 
 
 \section{Performance}
 
-The goal of introducing symmetry breaking clauses was to speed up the solution finding process by reducing the search space through the elimination of redundant search paths. However, eliminating symmetries by adding symmetry breaking clauses, as presented in the previous section, also increases the number of clauses that need to be evaluated on every assignment. How does this influence the overall performance of the SAT solver?
+The goal of introducing symmetry breaking clauses was to speed up the solution finding process by reducing the search space through the elimination of redundant search paths. However, eliminating symmetries by adding symmetry breaking clauses, as presented in the previous section, also increases the number of clauses that need to be evaluated on every assignment. How does this influence the overall performance of a SAT solver?
 
 
 \subsection{Performance Impact on Local Search}
@@ -422,7 +418,7 @@ When used on satisfiable instances of the problem, Walksat was found to perform 
 
 \subsection{Performance Impact on Backtracking}
 
-The other solver, Siege, is a modified version of the DPLL algorithm\cite{DPLL}. Siege uses randomized backtracking search and clause learning. As with Walksat, the symmetry breaking model does not perform as well as the model without symmetry breaking. This is contrary to Prestwich, who reported the effects of symmetry breaking on backtracking solvers to be ``strongly positive''. This again holds only for first-solution search, not for exhaustive search.
+The other solver, Siege, is a modified version of the DPLL algorithm\cite{DPLL}. Siege uses randomized backtracking search and clause learning. As with Walksat, the symmetry breaking model does not perform as well as the model without symmetry breaking. This is contrary to Prestwich, who reported the effects of symmetry breaking on backtracking solvers to be ``strongly positive''\cite{Prestwich}. This again holds only for first-solution search, not for exhaustive search.
 
 
 \section{Conclusion}
