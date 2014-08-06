@@ -24,7 +24,7 @@
 
 \begin{abstract}
 
-The increasing performance of modern SAT solvers encourages the reduction of problems from other areas, such as combinatorial problems, into SAT problems. To get the best performance, the encoding has to regard features of the problem, such as symmetry, as well as features of the solver. In this paper, I will present and analyze an encoding for the \emph{Social Golfer Problem}, a problem with a high degree of symmetry. Symmetry breaking constraints will be added to the encoding and effects the performance of different types of solvers will be discussed. 
+The increasing performance of modern SAT solvers encourages the reduction of problems from other areas, such as combinatorial problems, into SAT problems. To get the best performance, the encoding has to regard features of the problem, such as symmetry, as well as features of the solver. In this paper, I present and analyze an encoding for the \emph{Social Golfer Problem}, a problem with a high degree of symmetry. Symmetry breaking constraints are added to the encoding and effects on the performance of different types of solvers are discussed. 
 
 \end{abstract}
 
@@ -36,7 +36,7 @@ Modeling a problem into SAT can lead to different inefficiencies. For example, a
 
 While a lot of research is done on optimizing SAT solvers, a great deal of optimization can be achieved using the right encoding for the problem. When choosing an encoding, there are trade-offs to be made between different aspects of the encoding. One could aim for an encoding that is intuitive and easily understandable. It could be desired to have a minimum set of variables, minimizing the space of possible variable assignments and therefore speeding up computation. It could take into account specific features of the problem, such as symmetries in combinatorial problems.
 
-In the following, I will present an encoding for the \emph{Social Golfer Problem} as proposed by Gent et al.\cite{Gent05}. The encoding will use an intuitive set of variables that allows to state most constraints of the problem in easy readable clauses. It will also preserve the symmetrical nature of the problem. I will then try to eliminate these symmetries and examine the effects this measure has on the performance of different kinds of SAT solvers.
+In the following, I present an encoding for the \emph{Social Golfer Problem} as proposed by Gent et al.\cite{Gent05}. The encoding uses an intuitive set of variables that allows to state most constraints of the problem in easy readable clauses. It also preserves the symmetrical nature of the problem. I then try to eliminate these symmetries and examine the effects this measure has on the performance of different kinds of SAT solvers.
 
 \subsection{The Social Golfer Problem}
 
@@ -61,13 +61,13 @@ Fifteen young ladies in a school walk out three abreast for seven days in succes
 
 \end{mdframed}
 
-A tuple of $(1,2,(n/2))$ represents the problem of constructing a round-robin schedule for a two-player tournament, where $n$ is the number of players. The Social Golfer Problem itself is described by the tuple $(w,4,8)$. The overall goal is to find a maximal value for $w$. With 32 players and each player facing 3 new other players each week, $w$ can not be greater than 10. Since a solution for a 9 weeks schedule has already been posted, I will concentrate on finding a solution for 10 weeks.
+A tuple of $(1,2,(n/2))$ represents the problem of constructing a round-robin schedule for a two-player tournament, where $n$ is the number of players. The Social Golfer Problem itself is described by the tuple $(w,4,8)$. The overall goal is to find a maximal value for $w$. With 32 players and each player facing 3 new other players each week, $w$ can not be greater than 10. Since a solution for a 9 weeks schedule has already been posted, I concentrate on finding a solution for 10 weeks.
 
 \subsection{Symmetries in Combinatorial Problems}
 
 In many combinatorial it is necessary to group entities together by a given set of constraints. In these cases, the order of entities within such groups can be considered irrelevant. Sometimes even the order of groups is considered irrelevant. Whenever two solutions for a problem can be transformed into each other by exchanging entities within groups, these solutions are called \emph{symmetrical}. Symmetrical solutions build up equivalence classes which either contain only solutions or no solutions\cite{Smith01}.
 
-In the following, I will present an excerpt of a solution for \emph{Kirkman's Schoolgirl Problem}, which I presented in the section before. The presented solution shows the assignment of schoolgirls, denoted by letters from \emph{A} to \emph{O}, into groups of three on two days of the week:
+In the following, I present an excerpt of a solution for \emph{Kirkman's Schoolgirl Problem}, which I presented in the section before. The presented solution shows the assignment of schoolgirls, denoted by letters from \emph{A} to \emph{O}, into groups of three on two days of the week:
 
 \begin{table}[h]
 \centering
@@ -103,7 +103,7 @@ Monday & ADH  & BEK & CIO & \emph{GJM} & \emph{FLN}\\
 \end{tabular}
 \end{table}
 
-Symmetries within a solution space produce redundant search paths, which slow down backtracking search. When a partial assignment is proven to lead to an unsatisfying assignment, all symmetrical assignments will also lead to an unsatisfying assignment. This leads to the conclusion that a solver could work more efficient if these symmetrical assignments are ignored by the solver. Removing symmetries also reduces to solution space, which seems beneficial for solvers, as they do not have to make as many assignments compared to a solution space that contains symmetrical solutions.
+Symmetries within a solution space produce redundant search paths, which slow down backtracking search. When a partial assignment is proven to lead to an unsatisfying assignment, all symmetrical assignments also lead to an unsatisfying assignment. This leads to the conclusion that a solver could work more efficient if these symmetrical assignments are ignored by the solver. Removing symmetries also reduces to solution space, which seems beneficial for solvers, as they do not have to make as many assignments compared to a solution space that contains symmetrical solutions.
 
 \begin{figure}[h!]
 \centering
@@ -123,7 +123,7 @@ Symmetries can be removed in the following ways:
 
 \end{mdframed}
 
-The goal of \emph{remodeling} the problem is achieving a model that has less inherent symmetries. For example, enumerating the instances or groups within a problem will yield a highly symmetrical solution space. This is because the entities and groups are modeled distinguishable. Modeling the problem without any symmetries often times leads to the use of highly abstract variables, which takes a lot of effort. The effort of finding a model with no symmetry can out score the extra time the solver would need to solve the problem using a model that has symmetries.
+The goal of \emph{remodeling} the problem is achieving a model that has less inherent symmetries. For example, enumerating the instances or groups within a problem yields a highly symmetrical solution space. This is because the entities and groups are modeled distinguishable. Modeling the problem without any symmetries often times leads to the use of highly abstract variables, which takes a lot of effort. The effort of finding a model with no symmetry can out score the extra time the solver would need to solve the problem using a model that has symmetries.
 
 When \emph{adding symmetry breaking constraints} to the model, the original model of the problem stays the same. Additional constraints can produce computation overhead, which may in turn negate the effect of a smaller solution space. First-solution-search can be slowed down significantly, depending on the solver that is used\cite{Prestwich}.
 
@@ -131,14 +131,14 @@ In order to \emph{avoid symmetrical equivalent states during search}, the solver
 
 \section{Encoding of the Social Golfer Problem}
 
-In this section I will show how to encode the constraints of the Social Golfer Problem. The first group of constraints deals with the number of groups a golfer can be assigned to, the number of weeks that a group can be assigned to, et cetera. I will refer to these as \emph{``external constraints''}, as they set the framework within which I can assign golfers to groups and groups to weeks.
+In this section I show how to encode the constraints of the Social Golfer Problem. The first group of constraints deals with the number of groups a golfer can be assigned to, the number of weeks that a group can be assigned to, et cetera. I refer to these as \emph{``external constraints''}, as they set the framework within which I can assign golfers to groups and groups to weeks.
 
-The second group of constraints deals with the rule that each golfer is only allowed to play with each other player once. I will refer to these constraint as \emph{``internal constraints''}, as they deal with conflicts occurring in assignments which are valid with respect to the external constraints.
+The second group of constraints deals with the rule that each golfer is only allowed to play with each other player once. I refer to these constraint as \emph{``internal constraints''}, as they deal with conflicts occurring in assignments which are valid with respect to the external constraints.
 
 
 \subsection{Modeling external constraints}
 
-In order to model the Social Golfer Problem, I first need to define a model that represents whether a certain golfer plays in a certain week within a certain group. In addition to this, the model will also state that a given golfer is at a certain position within a group. With respect to the ambitions of eliminating symmetries within the model, this seems contradictory, since introducing an order into a set of exchangeable entities introduces additional symmetries. However, this way of modeling allows to state most of the constraints as ``at-most-one'' and ``at-least-one'' clauses, making the constraints themselves more intuitive.
+In order to model the Social Golfer Problem, I first need to define a model that represents whether a certain golfer plays in a certain week within a certain group. In addition to this, the model also states that a given golfer is at a certain position within a group. With respect to the ambitions of eliminating symmetries within the model, this seems contradictory, since introducing an order into a set of exchangeable entities introduces additional symmetries. However, this way of modeling allows to state most of the constraints as ``at-most-one'' and ``at-least-one'' clauses, making the constraints themselves more intuitive.
 
 Let $x = pg$ be the number of players. The first variable introduced to the model is $\textsc{Golfer}_{ijkl}$, with $1 \leq i \leq x$, $1 \leq j \leq p$, $1 \leq k \leq g$ and $1 \leq l \leq w$.
 
@@ -223,7 +223,7 @@ Finally, the following set of clauses ensures that each position within each gro
 
 \subsection{Modeling internal constraints}
 
-The last constraint needed guarantees that no golfer plays in the same group as any other golfer twice. To ensure this, I will introduce a construction that is called a ``ladder matrix''.
+The last constraint needed guarantees that no golfer plays in the same group as any other golfer twice. To ensure this, I introduce a construction that is called a ``ladder matrix''.
 
 
 \subsubsection{Constructing the ladder matrix}
