@@ -24,7 +24,7 @@
 
 \begin{abstract}
 
-The increasing performance of modern SAT solvers encourages the reduction of problems from other areas, such as combinatorial problems, into SAT problems. To get the best performance, the encoding has to regard features of the problem, such as symmetry, as well as features of the solver. In this paper, I will present and analyze an encoding for the \emph{Social Golfer Problem}, a problem with a high degree of symmetry. I will add symmetry breaking constraints to the encoding and discuss how this effects the performance of different types of solvers. 
+The increasing performance of modern SAT solvers encourages the reduction of problems from other areas, such as combinatorial problems, into SAT problems. To get the best performance, the encoding has to regard features of the problem, such as symmetry, as well as features of the solver. In this paper, I will present and analyze an encoding for the \emph{Social Golfer Problem}, a problem with a high degree of symmetry. Symmetry breaking constraints will be added to the encoding and effects the performance of different types of solvers will be discussed. 
 
 \end{abstract}
 
@@ -113,11 +113,15 @@ Symmetries within a solution space produce redundant search paths, which slow do
 
 Symmetries can be removed in the following ways:
 
+\begin{mdframed}[skipabove=\baselineskip, skipbelow=\baselineskip, leftmargin=20, rightmargin=20]
+
 \begin{enumerate}
 \item \emph{Remodel} the problem
 \item Add more \emph{constraints} to the model
 \item \emph{Avoid} symmetrically equivalent states during search
 \end{enumerate}
+
+\end{mdframed}
 
 The goal of \emph{remodeling} the problem is achieving a model that has less inherent symmetries. For example, enumerating the instances or groups within a problem will yield a highly symmetrical solution space. This is because the entities and groups are modeled distinguishable. Modeling the problem without any symmetries often times leads to the use of highly abstract variables, which takes a lot of effort. The effort of finding a model with no symmetry can out score the extra time the solver would need to solve the problem using a model that has symmetries.
 
@@ -127,16 +131,16 @@ In order to \emph{avoid symmetrical equivalent states during search}, the solver
 
 \section{Encoding of the Social Golfer Problem}
 
-In this section I encode the constraints of the Social Golfer Problem. The first group of constraints deals with the number of groups a golfer can be assigned to, the number of weeks that a group can be assigned to, et cetera. I will refer to this as \emph{``external constraints''}, as they set the framework within which I can assign golfers to groups and groups to weeks.
+In this section I will show how to encode the constraints of the Social Golfer Problem. The first group of constraints deals with the number of groups a golfer can be assigned to, the number of weeks that a group can be assigned to, et cetera. I will refer to these as \emph{``external constraints''}, as they set the framework within which I can assign golfers to groups and groups to weeks.
 
-The second group of constraints deals with the rule that each golfer is only allowed to play with each other player once. I will refer to this constraint as \emph{``internal constraint''}, as it deals with conflicts occurring in an assignment which is valid within the external constraints.
+The second group of constraints deals with the rule that each golfer is only allowed to play with each other player once. I will refer to these constraint as \emph{``internal constraints''}, as they deal with conflicts occurring in assignments which are valid with respect to the external constraints.
 
 
 \subsection{Modeling external constraints}
 
-In order to model the Social Golfer Problem, I first need to define a model that represents whether a certain golfer plays in a certain week within a certain group. In addition to this, the model will also state that a given golfer is at a certain position within a group. With respect to the ambitions of eliminating symmetries within the model, this seems certainly contradictory, since introducing any kind of order into a set of exchangeable entities will introduce additional symmetries. However, this way of modeling allows to state most of the constraints as ``at-most-one'' and ``at-least-one'' clauses, making the constraints themselves more intuitive.
+In order to model the Social Golfer Problem, I first need to define a model that represents whether a certain golfer plays in a certain week within a certain group. In addition to this, the model will also state that a given golfer is at a certain position within a group. With respect to the ambitions of eliminating symmetries within the model, this seems contradictory, since introducing an order into a set of exchangeable entities introduces additional symmetries. However, this way of modeling allows to state most of the constraints as ``at-most-one'' and ``at-least-one'' clauses, making the constraints themselves more intuitive.
 
-Let $x = p \times g$ be the number of players. The first variable introduced to the model is $\textsc{Golfer}_{ijkl}$, with $1 \leq i \leq x$, $1 \leq j \leq p$, $1 \leq k \leq g$ and $1 \leq l \leq w$.
+Let $x = pg$ be the number of players. The first variable introduced to the model is $\textsc{Golfer}_{ijkl}$, with $1 \leq i \leq x$, $1 \leq j \leq p$, $1 \leq k \leq g$ and $1 \leq l \leq w$.
 
 The constraint that each golfer plays in at least one group every week is expressed in the following way:
 
@@ -151,7 +155,7 @@ The constraint that each golfer plays in at least one group every week is expres
     \textsc{Golfer}_{ijkl}
 \end{equation}
 
-To make sure that no golfer is assigned to more than on position inside a group, I'll add the following clauses:
+To make sure that no golfer is assigned to more than on position inside a group, the following clauses are added:
 
 \begin{equation}
 % When a golfer plays at a position inside a group, he can not play on any other position in the same group
@@ -219,7 +223,7 @@ Finally, the following set of clauses ensures that each position within each gro
 
 \subsection{Modeling internal constraints}
 
-The last constraint I need to add is the one that guarantees that no golfer plays in the same group as any other golfer twice. To ensure this, I will introduce a construction that is called a ``ladder matrix''.
+The last constraint needed guarantees that no golfer plays in the same group as any other golfer twice. To ensure this, I will introduce a construction that is called a ``ladder matrix''.
 
 
 \subsubsection{Constructing the ladder matrix}
@@ -246,9 +250,9 @@ A ladder matrix is built with a set of auxiliary boolean ladder variables. The l
 
 
 
-Because I constructed variables for exactly ${x \choose 2}$, I end up with a set of all combinations of weeks and groups for each unique pair of two players. The next thing I need to do is to make sure that once a pair of players is assigned into one group within one week, this pair is not assigned any other group in any other week.
+Because I constructed variables for exactly ${x \choose 2}$, I end up with a set of all combinations of weeks and groups for each unique pair of two players. The next thing that needs to be done is to make sure that once a pair of players is assigned one group within one week, this pair is not assigned any other group in any other week.
 
-Consider the ladder variables for a fixed pair of players. I define such a row to be valid if and only if it is built of a sequence of zero or more \textsc{true} assignments, followed only by \textsc{false} assignments. So once a ladder variable within a row is set to \textsc{false}, each subsequent variable must also be \textsc{false}. This is achieved by adding clause \ref{ladder:propagation}:
+Consider the ladder variables for a fixed pair of players. Such a row is defined valid \emph{if and only if} it is built of a sequence of zero or more \textsc{true} assignments, followed only by \textsc{false} assignments. Once a ladder variable within a row is set to \textsc{false}, each subsequent variable must also be \textsc{false}. This is achieved by adding clause \ref{ladder:propagation}:
 
 \begin{equation}
 \label{ladder:propagation}
@@ -358,9 +362,9 @@ Conversely, whenever the entries of a row for a match of two players change from
 
 \section{Symmetry breaking}
 
-As already mentioned when defining the \textsc{Golfer} variable, the model turns out to be highly symmetrical. Besides ordering weeks, groups and players, I introduced more symmetries by ordering players within a group into certain positions. A model with minimal symmetries would have to model players, weeks, groups and positions within as completely interchangeable. However, finding such an encoding might cost more effort than it could be counterbalanced with an efficient non-symmetrical encoding. 
+As already mentioned when defining the \textsc{Golfer} variable, the model turns out to be highly symmetrical. Besides ordering weeks, groups and players, more symmetries are introduced by ordering players within a group into certain positions. A model with minimal symmetries would have to model players, weeks, groups and positions within as completely interchangeable. However, finding such an encoding might cost more effort than it could be counterbalanced with an efficient non-symmetrical encoding. 
 
-In order to break the symmetry introduced through the encoding, I will add some symmetry-breaking clauses to the encoding. The main idea here is to force entities into a lexicographical order. First, I will enforce an increasing numerical order onto players within the same group, by prohibiting assignments where players with indices smaller than the player at a certain position are placed at positions with a higher index than the latter:
+In order to break the symmetry introduced through the encoding, I will add some symmetry-breaking clauses to the encoding. The main idea here is to force entities into a lexicographical order. First, an increasing numerical order onto players within the same group is enforced, by prohibiting assignments where players with indices smaller than the player at a certain position are placed at positions with a higher index than the latter:
 
 \begin{equation}
 \centering
@@ -374,7 +378,7 @@ In order to break the symmetry introduced through the encoding, I will add some 
     \neg \textsc{Golfer}_{m(j+1)kl}
 \end{equation}
 
-More symmetries can be broken by forcing the first players of each group within one week into a lexicographical order. This is achieved by setting golfer number 1 as the first golfer in the first group within every week. Further I disallow assignments where golfers with a smaller index than the first golfer within a group are assigned the first golfer in a group with a bigger index than the latter:
+I can break more symmetries by forcing the first players of each group within one week into a lexicographical order. This is achieved by setting golfer number 1 as the first golfer in the first group within every week. Further I disallow assignments where golfers with a smaller index than the first golfer within a group are assigned the first golfer in a group with a bigger index than the latter:
 
 \begin{equation}
 \centering
@@ -387,7 +391,7 @@ More symmetries can be broken by forcing the first players of each group within 
     \neg \textsc{Golfer}_{m1(k+1)l}
 \end{equation}
 
-Lastly I will break symmetries between weeks. For this, I enforce a lexicographical order onto the second players within each group between weeks in a manner similar to the ones before:
+Lastly I will break symmetries between weeks. For this, a lexicographical order is enforced onto the second players within each group between weeks in a manner similar to the ones before:
 
 \begin{equation}
 \centering
@@ -422,7 +426,7 @@ The other solver, Siege, is a modified version of the DPLL algorithm\cite{DPLL}.
 
 \section{Conclusion}
 
-In this paper I explored an encoding for the Social Golfer Problem. As the problem was highly symmetrical, I took measures to remove these symmetries in the encoding. This was done by adding symmetry breaking constraints to the model. I then discussed the effects that symmetry breaking has on the performance of the different kinds of SAT solvers.
+In this paper I explored an encoding for the Social Golfer Problem. As the problem was highly symmetrical, I took measures to remove these symmetries in the encoding. I did this by adding symmetry breaking constraints to the model. I then discussed the effects that symmetry breaking has on the performance of the different kinds of SAT solvers.
 
 The presented encoding for the Social Golfer Problem used an intuitive variable set that allowed most constraints to be encoded into ``at least one'' and ``at most one'' clauses. The encoding introduced a lot of symmetries since it enumerated weeks, groups and golfers, and even added more symmetries by enumerating positions of golfers within teams. This enumerating led to an increased number of symmetry breaking clauses.
 
