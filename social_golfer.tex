@@ -131,7 +131,7 @@ In order to \emph{avoid symmetrical equivalent states during search}, the solver
 
 \section{Encoding of the Social Golfer Problem}
 
-In this section I show how to encode the constraints of the Social Golfer Problem. The first group of constraints deals with the number of groups a golfer can be assigned to, the number of weeks that a group can be assigned to, et cetera. I refer to these as \emph{``external constraints''}, as they set the framework within which I can assign golfers to groups and groups to weeks.
+In this section, I show how to encode the constraints of the Social Golfer Problem. The first group of constraints deals with the number of groups a golfer can be assigned to, the number of weeks that a group can be assigned to, et cetera. I refer to these as \emph{``external constraints''}, as they set the framework within which I can assign golfers to groups and groups to weeks.
 
 The second group of constraints deals with the rule that each golfer is only allowed to play with each other player once. I refer to these constraint as \emph{``internal constraints''}, as they deal with conflicts occurring in assignments which are valid with respect to the external constraints.
 
@@ -155,7 +155,7 @@ The constraint that each golfer plays in at least one group every week is expres
     \textsc{Golfer}_{ijkl}
 \end{equation}
 
-To make sure that no golfer is assigned to more than on position inside a group, the following clauses are added:
+To make sure that no golfer is assigned to more than one position inside a group, the following clauses are added:
 
 \begin{equation}
 % When a golfer plays at a position inside a group, he can not play on any other position in the same group
